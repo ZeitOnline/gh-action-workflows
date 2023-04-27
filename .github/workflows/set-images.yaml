@@ -1,0 +1,36 @@
+name: Set image tags
+on:
+  workflow_call:
+    inputs:
+      location:
+        required: true
+        type: string
+      images:
+        required: true
+        type: string
+jobs:
+  set-images:
+    name: Set image versions
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+      - name: Set image tags
+        run: |
+          cd ${{ inputs.location }}
+          kustomize edit set image ${{ inputs.images }}
+      - name: Commit and push image tags
+        run: |
+          git commit -am "Update image versions"
+          git push

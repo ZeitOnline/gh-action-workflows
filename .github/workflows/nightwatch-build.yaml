@@ -1,0 +1,63 @@
+name: Build nightwatch tests
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+    outputs:
+      tag:
+        description: "Tag of built 'nightwatch' image"
+        value: ${{ jobs.build.outputs.tag }}
+env:
+  PROJECT: ${{ inputs.project }}
+  IMAGE: ${{ vars.GAR_DOCKER_REGISTRY }}/${{ inputs.project }}-nightwatch
+jobs:
+  build:
+    name: Build docker image
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set tag
+        id: tag
+        run: date +tag=%Y%m%d%H%M%S >> "$GITHUB_OUTPUT"
+      - name: Setup auth
+        uses: ZeitOnline/gh-action-baseproject@v0
+        with:
+          project_name: ${{ env.PROJECT }}
+          environment: staging
+          gke_auth: true
+          google_auth: true
+          gar_docker_auth: true
+          vault_export_token: true
+      - name: Setup buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver: docker
+      - name: Build & push image
+        uses: docker/build-push-action@v4
+        with:
+          context: smoketest
+          target: nightwatch
+          tags: ${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+          push: true
+      - name: Run tests
+        run: |
+          TAG=${{ steps.tag.outputs.tag }}
+          kubectl config set-context --current --namespace=${{ env.PROJECT }}
+          kubectl run nightwatch-test-$TAG \
+            --image=${{ env.IMAGE }}:$TAG --restart=Never \
+            --env="VAULT_TOKEN=${{ env.VAULT_TOKEN }}" \
+            --env="NIGHTWATCH_PROXY=${{ vars.NIGHTWATCH_PROXY }}"
+          while ! [[ "$status" =~ (Failed|Succeeded) ]]; do
+            sleep 1
+            status=$( kubectl get -o template --template='{{.status.phase}}' pods/nightwatch-test-$TAG )
+          done
+          test "$status" = "Succeeded"
