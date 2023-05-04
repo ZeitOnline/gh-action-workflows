@@ -60,4 +60,6 @@ jobs:
           kubectl run nightwatch-test-$TAG --image=${{ env.IMAGE }}:$TAG --restart=Never ${{ inputs.args }}
           kubectl wait --for=condition=Ready pods/nightwatch-test-$TAG
           kubectl logs --follow pods/nightwatch-test-$TAG
-          kubectl wait --for=jsonpath='{.status.phase}'=Succeeded --timeout=10s pods/nightwatch-test-$TAG
+          sleep 10
+          status=$( kubectl get -o template --template='{{.status.phase}}' pods/nightwatch-test-$TAG )
+          test "$status" = "Succeeded"
