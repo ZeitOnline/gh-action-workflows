@@ -8,6 +8,8 @@ on:
       args:
         required: false
         type: string
+        default: |
+          --overrides='{ "spec": { "serviceAccount": "baseproject" } }'
     outputs:
       tag:
         description: "Tag of built 'nightwatch' image"
@@ -57,7 +59,6 @@ jobs:
           kubectl config set-context --current --namespace=${{ env.PROJECT }}
           kubectl run nightwatch-test-$TAG \
             --image=${{ env.IMAGE }}:$TAG --restart=Never \
-            --env="VAULT_TOKEN=${{ env.VAULT_TOKEN }}" \
             ${{ inputs.args }}
           while ! [[ "$status" =~ (Failed|Succeeded) ]]; do
             sleep 1
