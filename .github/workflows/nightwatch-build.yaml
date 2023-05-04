@@ -5,6 +5,9 @@ on:
       project:
         required: true
         type: string
+      args:
+        required: false
+        type: string
     outputs:
       tag:
         description: "Tag of built 'nightwatch' image"
@@ -55,7 +58,7 @@ jobs:
           kubectl run nightwatch-test-$TAG \
             --image=${{ env.IMAGE }}:$TAG --restart=Never \
             --env="VAULT_TOKEN=${{ env.VAULT_TOKEN }}" \
-            --env="NIGHTWATCH_PROXY=${{ vars.NIGHTWATCH_PROXY }}"
+            ${{ inputs.args }}
           while ! [[ "$status" =~ (Failed|Succeeded) ]]; do
             sleep 1
             status=$( kubectl get -o template --template='{{.status.phase}}' pods/nightwatch-test-$TAG )
