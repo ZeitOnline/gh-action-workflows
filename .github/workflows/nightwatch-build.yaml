@@ -57,11 +57,7 @@ jobs:
         run: |
           TAG=${{ steps.tag.outputs.tag }}
           kubectl config set-context --current --namespace=${{ env.PROJECT }}
-          kubectl run nightwatch-test-$TAG \
-            --image=${{ env.IMAGE }}:$TAG --restart=Never \
-            ${{ inputs.args }}
-          while ! [[ "$status" =~ (Failed|Succeeded) ]]; do
-            sleep 1
-            status=$( kubectl get -o template --template='{{.status.phase}}' pods/nightwatch-test-$TAG )
-          done
-          test "$status" = "Succeeded"
+          kubectl run nightwatch-test-$TAG --image=${{ env.IMAGE }}:$TAG --restart=Never ${{ inputs.args }}
+          kubectl wait --for=condition=Ready pods/nightwatch-test-$TAG
+          kubectl logs --follow pods/nightwatch-test-$TAG
+          kubectl wait --for=jsonpath='{.status.phase}'=Succeeded --timeout=10s pods/nightwatch-test-$TAG
