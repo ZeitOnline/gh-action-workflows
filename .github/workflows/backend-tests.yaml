@@ -1,0 +1,27 @@
+name: Backend tests
+on:
+  workflow_call:
+env:
+  COMPOSE_FILE: testing.yml
+jobs:
+  backend:
+    name: Backend
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build images
+        run: |
+          docker compose build backend
+      - name: Run tests
+        run: |
+          docker compose run --rm backend \
+            -- --verbose --junitxml=/testing/junit.xml
+      - name: Publish test result
+        uses: enricomi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          junit_files: testing/junit.xml
+          comment_mode: "off"

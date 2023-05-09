@@ -1,0 +1,15 @@
+name: Test code issues
+on:
+  workflow_call:
+jobs:
+  precommit:
+    name: Pre-Commit
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Run code checks
+        run: pre-commit run --all-files
