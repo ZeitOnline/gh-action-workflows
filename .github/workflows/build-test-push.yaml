@@ -16,6 +16,13 @@ on:
         required: false
         type: string
         default: testing.yml
+      compose_args:
+        required: false
+        type: string
+      test_args:
+        required: false
+        type: string
+        default: --verbose --junitxml=/testing/junit.xml
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
@@ -36,8 +43,8 @@ jobs:
           docker compose build ${{ inputs.service }}
       - name: Run tests
         run: |
-          docker compose run --rm ${{ inputs.service }} \
-            -- --verbose --junitxml=/testing/junit.xml
+          docker compose run --rm ${{ inputs.compose_args }} ${{ inputs.service }} \
+            -- ${{ inputs.test_args }}
       - name: Publish test result
         uses: enricomi/publish-unit-test-result-action@v2
         if: always()
