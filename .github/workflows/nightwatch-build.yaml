@@ -66,7 +66,7 @@ jobs:
       - name: Run tests
         run: |
           TAG=${{ env.tag }}
-          kubectl config set-context --current --namespace=${{ env.PROJECT }}
+          kubectl config set-context --current --namespace=${{ env.project }}
           kubectl run nightwatch-test-$TAG --image=${{ env.image }}:$TAG --restart=Never ${{ inputs.args }}
           kubectl wait --for=condition=Ready pods/nightwatch-test-$TAG
           kubectl logs --follow pods/nightwatch-test-$TAG
