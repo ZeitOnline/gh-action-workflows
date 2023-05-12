@@ -10,6 +10,9 @@ on:
         type: string
         default: |
           --overrides='{ "spec": { "serviceAccount": "baseproject" } }'
+      versions:
+        required: false
+        type: string
     outputs:
       tag:
         description: "Tag of built 'nightwatch' image"
@@ -20,7 +23,7 @@ jobs:
     runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
     permissions:
       id-token: write
-      contents: read
+      contents: write
       checks: write
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
@@ -70,3 +73,23 @@ jobs:
           sleep 10
           status=$( kubectl get -o template --template='{{.status.phase}}' pods/nightwatch-test-$TAG )
           test "$status" = "Succeeded"
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        if: inputs.versions
+        with:
+          gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+        if: inputs.versions
+      - name: Set image tags
+        if: inputs.versions
+        run: |
+          cd ${{ inputs.versions }}
+          kustomize edit set image nightwatch:${{ env.tag }}
+      - name: Commit and push image tags
+        if: inputs.versions
+        run: |
+          git commit -am "Update image versions"
+          git push
