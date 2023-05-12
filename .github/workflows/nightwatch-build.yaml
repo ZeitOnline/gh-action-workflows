@@ -3,7 +3,7 @@ on:
   workflow_call:
     inputs:
       project:
-        required: true
+        required: false
         type: string
       args:
         required: false
@@ -14,9 +14,6 @@ on:
       tag:
         description: "Tag of built 'nightwatch' image"
         value: ${{ jobs.build.outputs.tag }}
-env:
-  PROJECT: ${{ inputs.project }}
-  IMAGE: ${{ vars.GAR_DOCKER_REGISTRY }}/${{ inputs.project }}-nightwatch
 jobs:
   build:
     name: Build docker image
@@ -33,10 +30,20 @@ jobs:
       - name: Set tag
         id: tag
         run: date +tag=%Y%m%d%H%M%S >> "$GITHUB_OUTPUT"
+      - name: Set variables
+        id: vars
+        run: |
+          input="${{ inputs.project }}"
+          repository="${{ github.repository }}"
+          default="${repository##*/}"
+          project="${input:-$default}"
+          echo "project=$project" >> "$GITHUB_ENV"
+          echo "image=${{ vars.GAR_DOCKER_REGISTRY }}/$project-nightwatch" >> "$GITHUB_ENV"
+          echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
         uses: ZeitOnline/gh-action-baseproject@v0
         with:
-          project_name: ${{ env.PROJECT }}
+          project_name: ${{ env.project }}
           environment: staging
           gke_auth: true
           google_auth: true
@@ -51,13 +58,13 @@ jobs:
         with:
           context: smoketest
           target: nightwatch
-          tags: ${{ env.IMAGE }}:${{ steps.tag.outputs.tag }}
+          tags: ${{ env.image }}:${{ env.tag }}
           push: true
       - name: Run tests
         run: |
-          TAG=${{ steps.tag.outputs.tag }}
+          TAG=${{ env.tag }}
           kubectl config set-context --current --namespace=${{ env.PROJECT }}
-          kubectl run nightwatch-test-$TAG --image=${{ env.IMAGE }}:$TAG --restart=Never ${{ inputs.args }}
+          kubectl run nightwatch-test-$TAG --image=${{ env.image }}:$TAG --restart=Never ${{ inputs.args }}
           kubectl wait --for=condition=Ready pods/nightwatch-test-$TAG
           kubectl logs --follow pods/nightwatch-test-$TAG
           sleep 10
