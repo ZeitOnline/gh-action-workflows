@@ -18,7 +18,7 @@ on:
         description: "Tag of built 'nightwatch' image"
         value: ${{ jobs.build.outputs.tag }}
 env:
-  set_versions: ${{ inputs.versions and github.ref_name == 'main' }}
+  set_versions: ${{ inputs.versions && github.ref_name == 'main' }}
 jobs:
   build:
     name: Build docker image
