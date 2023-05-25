@@ -87,6 +87,10 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
         if: inputs.versions
+      - name: Pull recent changes
+        if: inputs.versions
+        run: |
+          git pull
       - name: Set image tags
         if: inputs.versions
         run: |
