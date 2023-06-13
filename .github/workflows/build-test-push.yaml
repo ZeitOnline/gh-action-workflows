@@ -6,6 +6,9 @@ on:
         required: false
         type: string
         default: backend
+      project:
+        required: false
+        type: string
       targets:
         required: false
         type: string
