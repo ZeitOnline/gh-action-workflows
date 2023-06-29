@@ -92,7 +92,7 @@ jobs:
         uses: imranismail/setup-kustomize@v2
         if: inputs.versions
       - name: Pull recent changes
-        if: inputs.versions
+        if: ${{ inputs.versions && github.ref_type == 'branch' }}
         run: |
           git pull
       - name: Set image tags
