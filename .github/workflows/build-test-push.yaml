@@ -26,6 +26,9 @@ on:
         required: false
         type: string
         default: --verbose --junitxml=/testing/junit.xml
+      artifacts:
+        required: false
+        type: string
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
@@ -55,6 +58,16 @@ jobs:
         with:
           junit_files: testing/junit.xml
           comment_mode: "off"
+      - name: Extract build artifacts
+        if: inputs.artifacts
+        run: |
+          docker compose run --rm --entrypoint "tar cvv ${{ inputs.artifacts }}/" ${{ inputs.service }} | tar x
+      - name: Store build artifacts
+        if: inputs.artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: ${{ inputs.artifacts }}*
       - name: Set variables
         id: vars
         run: |
