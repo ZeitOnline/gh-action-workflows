@@ -1,0 +1,26 @@
+name: Change log version
+on:
+  workflow_call:
+    outputs:
+      describe:
+        description: "Latest version tag from change log"
+        value: ${{ jobs.version.outputs.tag }}
+jobs:
+  version:
+    name: Extract version tag
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get version
+        id: version
+        run: |
+          today=$( date +%Y-%m-%d )
+          tag=$( sed -n "/^[.0-9]\+ ($today)/{s/ .*//;p;q}" CHANGES.* )
+          test -n "$tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
