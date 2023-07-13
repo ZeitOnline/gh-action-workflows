@@ -9,6 +9,9 @@ on:
       project:
         required: false
         type: string
+      tag:
+        required: false
+        type: string
       targets:
         required: false
         type: string
@@ -72,12 +75,13 @@ jobs:
         id: vars
         run: |
           input="${{ inputs.project }}"
+          tag="${{ inputs.tag }}"
           repository="${{ github.repository }}"
           default="${repository##*/}"
           project="${input:-$default}"
           echo "project=$project" >> "$GITHUB_ENV"
           echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
-          echo "describe=$( git describe --tags )" >> "$GITHUB_ENV"
+          echo "describe=${tag:-$( git describe --tags )}" >> "$GITHUB_ENV"
       - name: Setup auth
         id: baseproject
         uses: ZeitOnline/gh-action-baseproject@v0
