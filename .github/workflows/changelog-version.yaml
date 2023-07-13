@@ -2,7 +2,7 @@ name: Change log version
 on:
   workflow_call:
     outputs:
-      describe:
+      tag:
         description: "Latest version tag from change log"
         value: ${{ jobs.version.outputs.tag }}
 jobs:
