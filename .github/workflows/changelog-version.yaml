@@ -23,4 +23,5 @@ jobs:
           today=$( date +%Y-%m-%d )
           tag=$( sed -n "/^[.0-9]\+ ($today)/{s/ .*//;p;q}" CHANGES.* )
           test -n "$tag"
+          echo "found tag: $tag"
           echo "tag=$tag" >> $GITHUB_OUTPUT
