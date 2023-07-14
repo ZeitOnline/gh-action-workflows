@@ -23,6 +23,7 @@ jobs:
           git_tag_gpgsign: true
       - name: Create tag
         run: |
+          git pull
           tag="${{ inputs.tag }}"
           sed -n "/^$tag ([-0-9]\+)/,/^[0-9]/p" CHANGES.* | sed '$d' |\
           git tag --annotate --sign --file=- $tag
