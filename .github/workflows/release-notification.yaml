@@ -46,7 +46,7 @@ jobs:
             secrets: |
                 zon/v1/slack/hackbot HOOK_TOKEN;
     
-      - name: Post staging release in slack channel
+      - name: Post release in slack channel
         uses: fjogeleit/http-request-action@v1
         with:
             url: "https://hackbot.zon.zeit.de/${{ steps.vault-secrets.outputs.HOOK_TOKEN }}/deployment/releases"
