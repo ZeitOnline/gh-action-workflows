@@ -9,7 +9,7 @@ on:
         required: true
         type: string
       project:
-        required: true
+        required: false
         type: string
       emoji:
         required: false
@@ -28,11 +28,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set variables
+        id: vars
+        run: |
+          input="${{ inputs.project }}"
+          repository="${{ github.repository }}"
+          default="${repository##*/}"
+          project="${input:-$default}"
+          echo "project=$project" >> "$GITHUB_ENV"
+
       - name: Baseproject
         id: baseproject
         uses: ZeitOnline/gh-action-baseproject@v0
         with:
-            project_name: ${{ inputs.project }}
+            project_name: ${{ env.project }}
             environment: production
         
       - name: Retrieve secrets from Vault
@@ -52,7 +61,7 @@ jobs:
             url: "https://hackbot.zon.zeit.de/${{ steps.vault-secrets.outputs.HOOK_TOKEN }}/deployment/releases"
             method: 'POST'
             customHeaders: '{"Content-Type": "application/json"}'
-            data: '{"project": "${{ inputs.project }}", "environment": "${{ inputs.environment }}",
+            data: '{"project": "${{ env.project }}", "environment": "${{ inputs.environment }}",
                 "version": "${{ inputs.version }}", "emoji": "${{ inputs.emoji }}",
                 "vcs_url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
                 "changelog_url": "${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGES.txt"}'
