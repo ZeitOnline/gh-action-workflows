@@ -20,13 +20,13 @@ on:
         type: string
         default: loudspeaker
 jobs:
-  tag:
+  notify:
     name: Notify slackbot
     runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
 
     permissions:
       id-token: write
-      contents: write
+      contents: read
 
     steps:
       - name: Checkout
