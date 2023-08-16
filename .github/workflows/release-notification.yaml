@@ -11,6 +11,10 @@ on:
       project:
         required: false
         type: string
+      changelog:
+        required: false
+        type: string
+        default: CHANGES.txt
       emoji:
         required: false
         type: string
@@ -64,4 +68,4 @@ jobs:
             data: '{"project": "${{ env.project }}", "environment": "${{ inputs.environment }}",
                 "version": "${{ inputs.version }}", "emoji": "${{ inputs.emoji }}",
                 "vcs_url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
-                "changelog_url": "${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGES.txt"}'
+                "changelog_url": "${{ github.server_url }}/${{ github.repository }}/blob/main/${{ inputs.changelog }}"}'
