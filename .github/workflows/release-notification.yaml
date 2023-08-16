@@ -1,0 +1,71 @@
+name: Notify slackbot of release
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      project:
+        required: false
+        type: string
+      changelog:
+        required: false
+        type: string
+        default: CHANGES.txt
+      emoji:
+        required: false
+        type: string
+        default: loudspeaker
+jobs:
+  notify:
+    name: Notify slackbot
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set variables
+        id: vars
+        run: |
+          input="${{ inputs.project }}"
+          repository="${{ github.repository }}"
+          default="${repository##*/}"
+          project="${input:-$default}"
+          echo "project=$project" >> "$GITHUB_ENV"
+
+      - name: Baseproject
+        id: baseproject
+        uses: ZeitOnline/gh-action-baseproject@v0
+        with:
+            project_name: ${{ env.project }}
+            environment: production
+        
+      - name: Retrieve secrets from Vault
+        id: vault-secrets
+        uses: hashicorp/vault-action@v2.7.2
+        with:
+            method: jwt
+            url: ${{ steps.baseproject.outputs.vault_addr }}
+            path: ${{ steps.baseproject.outputs.gha_vault_path }}
+            role: ${{ steps.baseproject.outputs.gha_vault_role }}
+            secrets: |
+                zon/v1/slack/hackbot HOOK_TOKEN;
+    
+      - name: Post release in slack channel
+        uses: fjogeleit/http-request-action@v1
+        with:
+            url: "https://hackbot.zon.zeit.de/${{ steps.vault-secrets.outputs.HOOK_TOKEN }}/deployment/releases"
+            method: 'POST'
+            customHeaders: '{"Content-Type": "application/json"}'
+            data: '{"project": "${{ env.project }}", "environment": "${{ inputs.environment }}",
+                "version": "${{ inputs.version }}", "emoji": "${{ inputs.emoji }}",
+                "vcs_url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+                "changelog_url": "${{ github.server_url }}/${{ github.repository }}/blob/main/${{ inputs.changelog }}"}'
