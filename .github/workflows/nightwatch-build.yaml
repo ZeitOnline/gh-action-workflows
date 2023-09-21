@@ -91,5 +91,5 @@ jobs:
       - name: Commit and push image tags
         if: ${{ inputs.versions && github.ref_name == 'main' }}
         run: |
-          git commit -am "Update image versions (`${{ inputs.versions }}`)"
+          git commit -am "Update image versions (``${{ inputs.versions }}``)"
           git push
