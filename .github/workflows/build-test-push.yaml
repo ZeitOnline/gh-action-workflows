@@ -32,6 +32,10 @@ on:
       artifacts:
         required: false
         type: string
+      docker_context:
+        required: false
+        type: string
+        default: .
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
@@ -95,7 +99,7 @@ jobs:
         run: |
           for target in ${{ inputs.targets }}; do
             tag="${{ env.prefix }}-$target:${{ env.describe }}"
-            docker build --target $target --tag $tag .
+            docker build --target $target --tag $tag ${{ inputs.docker_context }}
             docker push $tag
           done
       - name: Import GPG key
