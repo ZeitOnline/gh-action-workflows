@@ -83,6 +83,10 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
         if: ${{ inputs.versions && github.ref_name == 'main' }}
+      - name: Pull recent changes
+        if: ${{ inputs.versions && github.ref_name == 'main' }}
+        run: |
+          git pull
       - name: Set image tags
         if: ${{ inputs.versions && github.ref_name == 'main' }}
         run: |
