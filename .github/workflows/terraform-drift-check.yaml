@@ -4,15 +4,15 @@ on:
       dir:
         required: true
         type: string
-      slack-bot-token:
-        required: true
-        type: string
       slack-channel:
         required: true
         type: string
       mode:
         type: string
         default: terragrunt
+    secrets:
+      slack-bot-token:
+        required: true
 
 jobs:
   check:
@@ -26,7 +26,7 @@ jobs:
       id-token: write
       contents: read
     env:
-      VAULT_ADDR: ${{ vars.VAULT_ADDR }} # What is this needed for?
+      VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
@@ -71,6 +71,6 @@ jobs:
           channel-id: ${{ inputs.slack-channel }}
           slack-message: "The project `${{ inputs.dir }}` in ${{github.repository}} contains <${{ env.BUILD_URL }}|unapplied changes>."
         env:
-          SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+          SLACK_BOT_TOKEN: ${{ secrets.slack-bot-token }}
           SLACK_COLOR: ${{ job.status }}
           BUILD_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
