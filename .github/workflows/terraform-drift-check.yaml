@@ -1,0 +1,76 @@
+on:
+  workflow_call:
+    inputs:
+      dir:
+        required: true
+        type: string
+      slack-bot-token:
+        required: true
+        type: string
+      slack-channel:
+        required: true
+        type: string
+      mode:
+        type: string
+        default: terragrunt
+
+jobs:
+  check:
+    name: Drift Check
+    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+
+    strategy:
+      fail-fast: false
+
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      VAULT_ADDR: ${{ vars.VAULT_ADDR }} # What is this needed for?
+      TF_VAR_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: GCloud OIDC Auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ vars.GHA_WIF_PROVIDER }}
+          service_account: gha-terraform@zeitonline-engineering.iam.gserviceaccount.com
+
+      - name: Vault OIDC Auth
+        uses: hashicorp/vault-action@v2
+        id: vault
+        with:
+          url: ${{ vars.VAULT_ADDR }}
+          method: jwt
+          path: github-actions
+          role: terraform-ops
+          exportToken: true
+          secrets: zon/v1/github/atlantis gh_token
+
+      - name: Write gitconfig
+        run: git config --global url."https://oauth2:${{ steps.vault.outputs.gh_token }}@github.com".insteadOf ssh://git@github.com # replace ssh auth with https token auth for private terraform-module repo
+
+      - name: Run terraform
+        if: ${{ inputs.mode == 'terraform' }}
+        run: |
+          terraform -chdir=${{ inputs.dir }} init; terraform -chdir=${{ inputs.dir }} plan -detailed-exitcode -lock=false -parallelism=30
+
+      - name: Run terragrunt
+        if: ${{ inputs.mode == 'terragrunt' }}
+        run: |
+          terragrunt plan --terragrunt-working-dir ${{ inputs.dir }} --terragrunt-ignore-external-dependencies -detailed-exitcode -lock=false -parallelism=30
+
+      - name: Send custom JSON data to Slack workflow
+        uses: slackapi/slack-github-action@v1
+        if: ${{ failure() }}
+        with:
+          channel-id: ${{ inputs.slack-channel }}
+          slack-message: "The project `${{ inputs.dir }}` in ${{github.repository}} contains <${{ env.BUILD_URL }}|unapplied changes>."
+        env:
+          SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+          SLACK_COLOR: ${{ job.status }}
+          BUILD_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
