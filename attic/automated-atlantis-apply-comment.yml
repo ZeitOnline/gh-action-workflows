@@ -1,0 +1,22 @@
+name: Auto Atlantis Apply
+
+on:
+  schedule:
+    - cron: '00 13 17 11 *'
+  workflow_dispatch:
+  
+jobs:
+  atlantis_apply:
+    name: Atlantis Apply
+    runs-on:
+      - self-hosted
+      - linux
+    permissions:
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: Apply comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: atlantis apply
+          pr_number: 2071
