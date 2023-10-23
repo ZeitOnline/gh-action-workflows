@@ -10,9 +10,6 @@ on:
       mode:
         type: string
         default: terragrunt
-    secrets:
-      slack-bot-token:
-        required: true
 
 jobs:
   check:
@@ -49,10 +46,12 @@ jobs:
           path: github-actions
           role: terraform-ops
           exportToken: true
-          secrets: zon/v1/github/atlantis gh_token
+          secrets: |
+            zon/v1/github/atlantis gh_token | github_token ;
+            zon/v1/slack/zeitonline/apps/github-actions-notifier token | slack_bot_token
 
       - name: Write gitconfig
-        run: git config --global url."https://oauth2:${{ steps.vault.outputs.gh_token }}@github.com".insteadOf ssh://git@github.com # replace ssh auth with https token auth for private terraform-module repo
+        run: git config --global url."https://oauth2:${{ steps.vault.outputs.github_token }}@github.com".insteadOf ssh://git@github.com # replace ssh auth with https token auth for private terraform-module repo
 
       - name: Run terraform
         if: ${{ inputs.mode == 'terraform' }}
@@ -69,8 +68,8 @@ jobs:
         if: ${{ failure() }}
         with:
           channel-id: ${{ inputs.slack-channel }}
-          slack-message: "The project `${{ inputs.dir }}` in ${{github.repository}} contains <${{ env.BUILD_URL }}|unapplied changes>."
+          slack-message: "The ${{ inputs.mode }} project `${{ inputs.dir }}` in ${{github.repository}} contains <${{ env.BUILD_URL }}|unapplied changes>."
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.slack-bot-token }}
+          SLACK_BOT_TOKEN: ${{ steps.vault.outputs.slack_bot_token }}
           SLACK_COLOR: ${{ job.status }}
           BUILD_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
