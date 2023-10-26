@@ -103,7 +103,7 @@ jobs:
             docker push $tag
           done
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         if: inputs.versions
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
