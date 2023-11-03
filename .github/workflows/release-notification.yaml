@@ -50,7 +50,7 @@ jobs:
         
       - name: Retrieve secrets from Vault
         id: vault-secrets
-        uses: hashicorp/vault-action@v2.7.2
+        uses: hashicorp/vault-action@v2.7.4
         with:
             method: jwt
             url: ${{ steps.baseproject.outputs.vault_addr }}
