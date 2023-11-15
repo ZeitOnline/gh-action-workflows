@@ -22,7 +22,7 @@ on:
 jobs:
   notify:
     name: Notify slackbot
-    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    runs-on: zon-ubuntu-general-dind
 
     permissions:
       id-token: write

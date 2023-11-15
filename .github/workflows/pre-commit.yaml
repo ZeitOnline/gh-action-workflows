@@ -4,7 +4,7 @@ on:
 jobs:
   precommit:
     name: Pre-Commit
-    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    runs-on: zon-ubuntu-general-dind
     permissions:
       contents: read
     steps:

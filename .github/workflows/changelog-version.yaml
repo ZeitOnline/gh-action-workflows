@@ -8,7 +8,7 @@ on:
 jobs:
   version:
     name: Extract version tag
-    runs-on: [self-hosted, x64, linux, ephemeral, zon-image-latest]
+    runs-on: zon-ubuntu-general-dind
     permissions:
       id-token: write
       contents: read
