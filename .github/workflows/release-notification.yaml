@@ -47,6 +47,7 @@ jobs:
         with:
             project_name: ${{ env.project }}
             environment: production
+            vault_export_token: true
         
       - name: Retrieve secrets from Vault
         id: vault-secrets
