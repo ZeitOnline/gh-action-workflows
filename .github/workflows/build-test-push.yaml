@@ -71,7 +71,7 @@ jobs:
           docker compose run --rm --entrypoint "tar cvv ${{ inputs.artifacts }}/" ${{ inputs.service }} | tar x
       - name: Store build artifacts
         if: inputs.artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: ${{ inputs.artifacts }}*
