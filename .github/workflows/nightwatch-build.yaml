@@ -72,6 +72,7 @@ jobs:
           kubectl logs --follow pods/nightwatch-test-$TAG
           sleep 10
           status=$( kubectl get -o template --template='{{.status.phase}}' pods/nightwatch-test-$TAG )
+          kubectl delete pods/nightwatch-test-$TAG
           test "$status" = "Succeeded"
       - name: Pull recent changes
         if: ${{ inputs.versions && github.ref_name == 'main' }}
