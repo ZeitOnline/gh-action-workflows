@@ -81,4 +81,4 @@ jobs:
             echo '# HELP gha_deployments'
             echo '# TYPE gha_deployments gauge'
             echo 'gha_deployments{environment="${{ inputs.environment }}",project="${{ env.project }}",version="${{ inputs.version }}"}' $( date +%s )
-          ) | curl --silent --data-binary @- http://pushgateway.cluster-infra.svc.cluster.local:9091/metrics/job/${{ inputs.prometheus_job }}
+          ) | curl --silent --data-binary @- http://pushgateway.cluster-infra.svc.cluster.local:9091/metrics/job/${{ inputs.prometheus_job }}-${{ env.project }}
