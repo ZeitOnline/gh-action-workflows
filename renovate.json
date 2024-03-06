@@ -8,6 +8,6 @@
   "prConcurrentLimit": 0,
 
   "enabledManagers": [
-    "github-actions"  
+    "github-actions"
   ]
 }

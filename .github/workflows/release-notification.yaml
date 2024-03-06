@@ -51,7 +51,7 @@ jobs:
         with:
             project_name: ${{ env.project }}
             environment: production
-        
+
       - name: Retrieve secrets from Vault
         id: vault-secrets
         uses: hashicorp/vault-action@v2.8.1
@@ -62,7 +62,7 @@ jobs:
             role: ${{ steps.baseproject.outputs.gha_vault_role }}
             secrets: |
                 zon/v1/slack/hackbot HOOK_TOKEN;
-    
+
       - name: Post release in slack channel
         uses: fjogeleit/http-request-action@v1
         with:
