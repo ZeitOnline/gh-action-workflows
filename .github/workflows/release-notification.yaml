@@ -19,9 +19,13 @@ on:
         required: false
         type: string
         default: loudspeaker
+      prometheus_job:
+        required: false
+        type: string
+        default: gha-deployments
 jobs:
   notify:
-    name: Notify slackbot
+    name: Notify slackbot & prometheus
     runs-on: zon-ubuntu-general-dind
 
     permissions:
@@ -69,3 +73,12 @@ jobs:
                 "version": "${{ inputs.version }}", "emoji": "${{ inputs.emoji }}",
                 "vcs_url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
                 "changelog_url": "${{ github.server_url }}/${{ github.repository }}/blob/main/${{ inputs.changelog }}"}'
+
+      - name: Post release time to prometheus
+        if: inputs.prometheus_job
+        run: |
+          (
+            echo '# HELP gha_deployments'
+            echo '# TYPE gha_deployments gauge'
+            echo 'gha_deployments{environment="${{ inputs.environment }}",project="${{ env.project }}",version="${{ inputs.version }}"}' $( date +%s )
+          ) | curl --silent --data-binary @- http://pushgateway.cluster-infra.svc.cluster.local:9091/metrics/job/${{ inputs.prometheus_job }}
