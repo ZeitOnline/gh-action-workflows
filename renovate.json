@@ -1,12 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-
   "dependencyDashboard": true,
-
-  "draftPR": true,
-  "prHourlyLimit": 0,
-  "prConcurrentLimit": 0,
-
+  "lockFileMaintenance": { "enabled": true },
+  "schedule": ["before 5am every weekday"],
   "enabledManagers": [
     "github-actions"
   ]
