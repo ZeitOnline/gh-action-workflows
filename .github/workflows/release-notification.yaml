@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Set variables
         id: vars
@@ -47,14 +47,14 @@ jobs:
 
       - name: Baseproject
         id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@8e4cc6e4fea8dced0d6edf3c7da84d1b92c6f610 # v0
         with:
             project_name: ${{ env.project }}
             environment: production
 
       - name: Retrieve secrets from Vault
         id: vault-secrets
-        uses: hashicorp/vault-action@v2.8.1
+        uses: hashicorp/vault-action@9c2d817b85b9fff56bcab21cb74b485aee9e9d73 # v2.8.1
         with:
             method: jwt
             url: ${{ steps.baseproject.outputs.vault_addr }}
@@ -64,7 +64,7 @@ jobs:
                 zon/v1/slack/hackbot HOOK_TOKEN;
 
       - name: Post release in slack channel
-        uses: fjogeleit/http-request-action@v1
+        uses: fjogeleit/http-request-action@44816be1eabb9c1122d8d775923f39bbe55c67a3 # v1
         with:
             url: "https://hackbot.zon.zeit.de/${{ steps.vault-secrets.outputs.HOOK_TOKEN }}/deployment/releases"
             method: 'POST'

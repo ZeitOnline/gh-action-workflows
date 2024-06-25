@@ -29,7 +29,7 @@ jobs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Set tag
         id: tag
         run: date +tag=%Y%m%d%H%M%S >> "$GITHUB_OUTPUT"
@@ -44,7 +44,7 @@ jobs:
           echo "image=${{ vars.GAR_DOCKER_REGISTRY }}/$project-nightwatch" >> "$GITHUB_ENV"
           echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@8e4cc6e4fea8dced0d6edf3c7da84d1b92c6f610 # v0
         with:
           project_name: ${{ env.project }}
           environment: staging
@@ -53,11 +53,11 @@ jobs:
           gar_docker_auth: true
           vault_export_token: true
       - name: Setup buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3
         with:
           driver: docker
       - name: Build & push image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
           context: smoketest
           target: nightwatch
