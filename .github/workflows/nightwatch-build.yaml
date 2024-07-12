@@ -1,4 +1,27 @@
 name: Build nightwatch tests
+
+# ### Example usage `nightwatch.yaml`
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - '.github/workflows/nightwatch.yaml'
+#       - 'smoketest/**'
+#       - '!smoketest/k8s/versions/*'
+#   pull_request:
+#     paths:
+#       - '.github/workflows/nightwatch.yaml'
+#       - 'smoketest/**'
+#       - '!smoketest/k8s/versions/*'
+# jobs:
+#   build:
+#     uses: zeitonline/gh-action-workflows/.github/workflows/nightwatch-build.yaml@XXX
+#     secrets: inherit
+#     with:
+#       versions: smoketest/k8s/versions
+#       project: MYPROJECT
+
 on:
   workflow_call:
     inputs:
