@@ -14,7 +14,7 @@ on:
       changelog:
         required: false
         type: string
-        default: CHANGES.txt
+        default: CHANGES.md
       emoji:
         required: false
         type: string
