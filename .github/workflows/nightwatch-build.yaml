@@ -75,10 +75,6 @@ jobs:
           google_auth: true
           gar_docker_auth: true
           vault_export_token: true
-      - name: Setup buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
       - name: Build & push image
         uses: docker/build-push-action@v5
         with:
