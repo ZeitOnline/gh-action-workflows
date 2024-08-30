@@ -53,6 +53,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PRIVATE_REPO_ACCESS_PAT }}
       - name: Set tag
         id: tag
         run: date +tag=%Y%m%d%H%M%S >> "$GITHUB_OUTPUT"
