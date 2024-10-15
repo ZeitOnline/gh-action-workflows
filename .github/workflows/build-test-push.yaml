@@ -48,7 +48,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
         with:
           fetch-depth: 0
           submodules: true
@@ -60,7 +60,7 @@ jobs:
           docker compose run --rm ${{ inputs.compose_args }} ${{ inputs.service }} \
             -- ${{ inputs.test_args }}
       - name: Publish test result
-        uses: enricomi/publish-unit-test-result-action@v2
+        uses: enricomi/publish-unit-test-result-action@82082dac68ad6a19d980f8ce817e108b9f496c2a # v2
         if: always()
         with:
           junit_files: testing/junit.xml
@@ -71,7 +71,7 @@ jobs:
           docker compose run --rm --entrypoint "tar cvv ${{ inputs.artifacts }}/" ${{ inputs.service }} | tar x
       - name: Store build artifacts
         if: inputs.artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: artifacts
           path: ${{ inputs.artifacts }}*
@@ -88,7 +88,7 @@ jobs:
           echo "describe=${tag:-$( git describe --tags )}" >> "$GITHUB_ENV"
       - name: Setup auth
         id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@5e4d8efb094472e8d0c361be6919036ca06eb9aa # v0
         if: inputs.targets
         with:
           project_name: ${{ env.project }}
@@ -103,14 +103,14 @@ jobs:
             docker push $tag
           done
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4 # v6
         if: inputs.versions
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Set up Kustomize
-        uses: imranismail/setup-kustomize@v2
+        uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2
         if: inputs.versions
       - name: Pull recent changes
         if: ${{ inputs.versions && github.ref_type == 'branch' }}
