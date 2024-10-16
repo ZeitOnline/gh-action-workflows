@@ -32,5 +32,5 @@ jobs:
           kustomize edit set image ${{ inputs.images }}
       - name: Commit and push image tags
         run: |
-          git commit -am "Update image versions (``${{ inputs.versions }}``)"
+          git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
           git push

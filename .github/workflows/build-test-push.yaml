@@ -126,5 +126,5 @@ jobs:
       - name: Commit and push image tags
         if: inputs.versions
         run: |
-          git commit -am "Update image versions (``${{ inputs.versions }}``)"
+          git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
           git push
