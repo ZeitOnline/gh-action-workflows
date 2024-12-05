@@ -53,6 +53,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      # build images, run tests and handle artifacts
       - name: Build images
         run: |
           docker compose build ${{ inputs.service }}
@@ -76,6 +77,7 @@ jobs:
         with:
           name: artifacts
           path: ${{ inputs.artifacts }}*
+      # set up variables and auth
       - name: Set variables
         id: vars
         run: |
@@ -95,10 +97,12 @@ jobs:
           project_name: ${{ env.project }}
           environment: production     # needs 'production' service account
           gar_docker_auth: true
+      # update release pull request or create release (if merged)
       - name: Release please
         id: release
         uses: googleapis/release-please-action@v4
         if: inputs.targets
+      # publish images depending on release
       - name: Publish images
         if: inputs.targets
         run: |
@@ -108,6 +112,8 @@ jobs:
             docker build --target $target --tag $tag ${{ inputs.docker_context }}
             docker push $tag
           done
+      # in case of a release any versions should be set via `extra-files`
+      # otherwise the image versions are updated for 'staging'
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         if: inputs.versions && steps.release.outputs.release_created == false
