@@ -95,22 +95,11 @@ jobs:
         with:
           project_name: ${{ env.project }}
           environment: production     # needs 'production' service account
-          gar_docker_auth: true
       # update release pull request or create release (if merged)
       - name: Release please
         id: release
         uses: googleapis/release-please-action@v4
         if: inputs.targets
-      # publish images depending on release
-      - name: Publish images
-        if: inputs.targets
-        run: |
-          version="${{ steps.release.outputs.release_created && steps.release.outputs.tag_name || env.describe }}"
-          for target in ${{ inputs.targets }}; do
-            tag="${{ env.prefix }}-$target:$version"
-            docker build --target $target --tag $tag ${{ inputs.docker_context }}
-            docker push $tag
-          done
       # in case of a release any versions should be set via `extra-files`
       # otherwise the image versions are updated for 'staging'
       - name: Import GPG key
