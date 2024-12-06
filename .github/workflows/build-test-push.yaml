@@ -33,6 +33,13 @@ on:
         required: false
         type: string
         default: .
+    outputs:
+      release_created:
+        description: Indicator if a release was created
+        value: ${{ jobs.test-and-push.outputs.release_created }}
+      tag_name:
+        description: Release version tag if any
+        value: ${{ jobs.test-and-push.outputs.tag_name }}
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
