@@ -115,27 +115,27 @@ jobs:
       # otherwise the image versions are updated for 'staging'
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
-        if: inputs.versions && steps.release.outputs.release_created == false
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
-        if: inputs.versions && steps.release.outputs.release_created == false
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
       - name: Pull recent changes
-        if: ${{ inputs.versions && steps.release.outputs.release_created == false && github.ref_type == 'branch' }}
+        if: ${{ inputs.versions && !steps.release.outputs.release_created && github.ref_type == 'branch' }}
         run: |
           git pull
       - name: Set image tags
-        if: inputs.versions && steps.release.outputs.release_created == false
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         run: |
           cd ${{ inputs.versions }}
           for target in ${{ inputs.targets }}; do
             kustomize edit set image $target:${{ env.describe }}
           done
       - name: Commit and push image tags
-        if: inputs.versions && steps.release.outputs.release_created == false
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         run: |
           git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
           git push
