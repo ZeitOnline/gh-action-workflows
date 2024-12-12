@@ -14,7 +14,7 @@ on:
       changelog:
         required: false
         type: string
-        default: CHANGES.md
+        default: CHANGELOG.md
       emoji:
         required: false
         type: string
@@ -71,7 +71,7 @@ jobs:
             customHeaders: '{"Content-Type": "application/json"}'
             data: '{"project": "${{ env.project }}", "environment": "${{ inputs.environment }}",
                 "version": "${{ inputs.version }}", "emoji": "${{ inputs.emoji }}",
-                "vcs_url": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+                "vcs_url": "${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ inputs.version }}",
                 "changelog_url": "${{ github.server_url }}/${{ github.repository }}/blob/main/${{ inputs.changelog }}"}'
 
       - name: Post release time to prometheus

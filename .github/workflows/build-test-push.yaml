@@ -9,9 +9,6 @@ on:
       project:
         required: false
         type: string
-      tag:
-        required: false
-        type: string
       targets:
         required: false
         type: string
@@ -36,6 +33,13 @@ on:
         required: false
         type: string
         default: .
+    outputs:
+      release_created:
+        description: Indicator if a release was created
+        value: ${{ jobs.test-and-push.outputs.release_created }}
+      tag_name:
+        description: Release version tag if any
+        value: ${{ jobs.test-and-push.outputs.tag_name }}
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
@@ -46,12 +50,17 @@ jobs:
       id-token: write
       contents: write
       checks: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: true
+      # build images, run tests and handle artifacts
       - name: Build images
         run: |
           docker compose build ${{ inputs.service }}
@@ -75,17 +84,17 @@ jobs:
         with:
           name: artifacts
           path: ${{ inputs.artifacts }}*
+      # set up variables and auth
       - name: Set variables
         id: vars
         run: |
           input="${{ inputs.project }}"
-          tag="${{ inputs.tag }}"
           repository="${{ github.repository }}"
           default="${repository##*/}"
           project="${input:-$default}"
           echo "project=$project" >> "$GITHUB_ENV"
           echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
-          echo "describe=${tag:-$( git describe --tags )}" >> "$GITHUB_ENV"
+          echo "describe=$( git describe --tags )" >> "$GITHUB_ENV"
       - name: Setup auth
         id: baseproject
         uses: ZeitOnline/gh-action-baseproject@v0
@@ -94,37 +103,46 @@ jobs:
           project_name: ${{ env.project }}
           environment: production     # needs 'production' service account
           gar_docker_auth: true
+      # update release pull request or create release (if merged)
+      - name: Release please
+        id: release
+        uses: googleapis/release-please-action@v4
+        if: inputs.targets
+      # publish images depending on release
       - name: Publish images
         if: inputs.targets
         run: |
+          version="${{ steps.release.outputs.release_created && steps.release.outputs.tag_name || env.describe }}"
           for target in ${{ inputs.targets }}; do
-            tag="${{ env.prefix }}-$target:${{ env.describe }}"
+            tag="${{ env.prefix }}-$target:$version"
             docker build --target $target --tag $tag ${{ inputs.docker_context }}
             docker push $tag
           done
+      # in case of a release any versions should be set via `extra-files`
+      # otherwise the image versions are updated for 'staging'
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
-        if: inputs.versions
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
-        if: inputs.versions
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
       - name: Pull recent changes
-        if: ${{ inputs.versions && github.ref_type == 'branch' }}
+        if: ${{ inputs.versions && !steps.release.outputs.release_created && github.ref_type == 'branch' }}
         run: |
           git pull
       - name: Set image tags
-        if: inputs.versions
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         run: |
           cd ${{ inputs.versions }}
           for target in ${{ inputs.targets }}; do
             kustomize edit set image $target:${{ env.describe }}
           done
       - name: Commit and push image tags
-        if: inputs.versions
+        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         run: |
           git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
           git push
