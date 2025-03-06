@@ -32,7 +32,11 @@ on:
         required: false
         type: string
         default: |
-          --overrides='{ "spec": { "serviceAccount": "baseproject" } }'
+          --override-type=json --overrides='[
+            {"op": "add", "path": "/spec/serviceAccount", "value": "baseproject"},
+            {"op": "add", "path": "/spec/containers/0/envFrom", "value": [{
+                "secretRef": {"name": "nightwatch-secrets", "optional": true}}]}
+          ]'
       versions:
         required: false
         type: string
