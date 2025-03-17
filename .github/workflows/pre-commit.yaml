@@ -15,9 +15,8 @@ jobs:
           node-version: '20'
       - name: Install node modules
         run: npm install
+        working-directory: frontend/
       - name: Install pre-commit
-        run: |
-          cd frontend
-          pip install pre-commit
+        run: pip install pre-commit
       - name: Run code checks
         run: pre-commit run --all-files
