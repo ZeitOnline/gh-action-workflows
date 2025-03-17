@@ -9,6 +9,12 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install node modules
+        run: npm install
       - name: Install pre-commit
         run: pip install pre-commit
       - name: Run code checks
