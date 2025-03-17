@@ -16,6 +16,8 @@ jobs:
       - name: Install node modules
         run: npm install
       - name: Install pre-commit
-        run: pip install pre-commit
+        run: |
+          cd frontend
+          pip install pre-commit
       - name: Run code checks
         run: pre-commit run --all-files
