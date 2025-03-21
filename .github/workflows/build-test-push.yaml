@@ -56,7 +56,7 @@ jobs:
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
           submodules: true
@@ -69,7 +69,7 @@ jobs:
           docker compose run --rm ${{ inputs.compose_args }} ${{ inputs.service }} \
             -- ${{ inputs.test_args }}
       - name: Publish test result
-        uses: enricomi/publish-unit-test-result-action@v2
+        uses: enricomi/publish-unit-test-result-action@170bf24d20d201b842d7a52403b73ed297e6645b # v2
         if: always()
         with:
           junit_files: testing/junit.xml
@@ -80,7 +80,7 @@ jobs:
           docker compose run --rm --entrypoint "tar cvv ${{ inputs.artifacts }}/" ${{ inputs.service }} | tar x
       - name: Store build artifacts
         if: inputs.artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: artifacts
           path: ${{ inputs.artifacts }}*
@@ -97,7 +97,7 @@ jobs:
           echo "describe=$( git describe --tags )" >> "$GITHUB_ENV"
       - name: Setup auth
         id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@9ed16e23e3b0465030ee4f20abd955b87f159317 # v0
         if: inputs.targets
         with:
           project_name: ${{ env.project }}
@@ -106,7 +106,7 @@ jobs:
       # update release pull request or create release (if merged)
       - name: Release please
         id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@a02a34c4d625f9be7cb89156071d8567266a2445 # v4
         if: inputs.targets
       # publish images depending on release
       - name: Publish images
@@ -121,14 +121,14 @@ jobs:
       # in case of a release any versions should be set via `extra-files`
       # otherwise the image versions are updated for 'staging'
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@cb9bde2e2525e640591a934b1fd28eef1dcaf5e5 # v6
         if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Set up Kustomize
-        uses: imranismail/setup-kustomize@v2
+        uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2
         if: ${{ inputs.versions && !steps.release.outputs.release_created }}
       - name: Pull recent changes
         if: ${{ inputs.versions && !steps.release.outputs.release_created && github.ref_type == 'branch' }}
