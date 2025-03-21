@@ -6,7 +6,6 @@
 ### Features
 
 * add workflow to lint commit messages with 'commitlint' ([5f91b76](https://github.com/ZeitOnline/gh-action-workflows/commit/5f91b761c85c28cbbc7eb896285031b5addf7463))
-* **nightwatch:** always mount the nighwatch secret, keeping it optional ([a097dc6](https://github.com/ZeitOnline/gh-action-workflows/commit/a097dc6821f9e0d79c0f7355e747d39e70051063))
 * **nightwatch:** always mount the nighwatch secret, keeping it optional ([#24](https://github.com/ZeitOnline/gh-action-workflows/issues/24)) ([4b139e1](https://github.com/ZeitOnline/gh-action-workflows/commit/4b139e181d1bde19d7ea236b1bc1563ef80d6838))
 
 ## [2.0.0](https://github.com/ZeitOnline/gh-action-workflows/compare/v1.18.0...2.0.0) (2024-12-19)
