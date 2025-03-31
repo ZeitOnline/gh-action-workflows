@@ -121,7 +121,7 @@ jobs:
       # in case of a release any versions should be set via `extra-files`
       # otherwise the image versions are updated for 'staging'
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@cb9bde2e2525e640591a934b1fd28eef1dcaf5e5 # v6
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
         if: ${{ inputs.versions && !steps.release.outputs.release_created }}
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
