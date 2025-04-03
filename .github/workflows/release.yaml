@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'main'
+      - "main"
 concurrency:
   group: release
   cancel-in-progress: true
@@ -14,6 +14,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
     steps:
       - name: Release please
         uses: googleapis/release-please-action@a02a34c4d625f9be7cb89156071d8567266a2445 # v4
