@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.2.0...2.2.1) (2025-04-10)
+
+
+### Bug Fixes
+
+* add issues write permission to release-please job ([#28](https://github.com/ZeitOnline/gh-action-workflows/issues/28)) ([7201356](https://github.com/ZeitOnline/gh-action-workflows/commit/720135651890608dfe97a45b7b640343b94ce6e0))
+
 ## [2.2.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.1.0...2.2.0) (2025-04-10)
 
 
