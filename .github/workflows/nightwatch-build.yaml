@@ -89,6 +89,7 @@ jobs:
           tags: ${{ env.image }}:${{ env.tag }}
           push: true
       - name: Run tests
+        if: github.ref_name != 'main'
         run: |
           TAG=${{ env.tag }}
           kubectl config set-context --current --namespace=${{ env.project }}
