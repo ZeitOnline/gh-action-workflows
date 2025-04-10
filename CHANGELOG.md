@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.1.0...2.2.0) (2025-04-10)
+
+
+### Features
+
+* **nightwatch:** assume we do want the change if it is pushed on main ([#29](https://github.com/ZeitOnline/gh-action-workflows/issues/29)) ([d94da43](https://github.com/ZeitOnline/gh-action-workflows/commit/d94da43619ad99160e5307ba0d041aa15f504155))
+
 ## [2.1.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.0.0...2.1.0) (2025-03-21)
 
 
