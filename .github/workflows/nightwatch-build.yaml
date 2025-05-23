@@ -28,6 +28,10 @@ on:
       project:
         required: false
         type: string
+      environment:
+        required: false
+        type: string
+        default: staging
       args:
         required: false
         type: string
@@ -76,7 +80,7 @@ jobs:
         uses: ZeitOnline/gh-action-baseproject@9ed16e23e3b0465030ee4f20abd955b87f159317 # v0
         with:
           project_name: ${{ env.project }}
-          environment: staging
+          environment: ${{ inputs.environment }}
           gke_auth: true
           google_auth: true
           gar_docker_auth: true
