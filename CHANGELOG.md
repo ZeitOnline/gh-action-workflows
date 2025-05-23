@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.2.1...2.3.0) (2025-05-23)
+
+
+### Features
+
+* **nightwatch:** allow to set the environment ([#34](https://github.com/ZeitOnline/gh-action-workflows/issues/34)) ([7d0c359](https://github.com/ZeitOnline/gh-action-workflows/commit/7d0c3595b7c2932f71e22aa4936902f6f59164a9))
+
 ## [2.2.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.2.0...2.2.1) (2025-04-10)
 
 
