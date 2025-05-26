@@ -3,8 +3,8 @@ on:
   workflow_call:
     inputs:
       environments:
-        description: "Comma-separated list of environments to validate (e.g., staging,production)"
-        default: "staging,production"
+        description: "space-separated list of environments to validate (e.g. 'staging production')"
+        default: "staging production"
         required: true
         type: string
 jobs:
@@ -21,7 +21,7 @@ jobs:
     - name: Generate manifests
       run: |
         mkdir manifests
-        for env in ${${{ inputs.environments }}//,/ } do
+        for env in ${{ inputs.environments }}; do
           kubectl kustomize k8s/$env > manifests/$env.yaml
         done
     - name: Validate manifests
