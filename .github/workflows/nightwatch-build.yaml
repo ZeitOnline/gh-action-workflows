@@ -78,6 +78,7 @@ jobs:
           echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
         uses: ZeitOnline/gh-action-baseproject@9ed16e23e3b0465030ee4f20abd955b87f159317 # v0
+        id: baseproject
         with:
           project_name: ${{ env.project }}
           environment: ${{ inputs.environment }}
@@ -92,6 +93,10 @@ jobs:
           target: nightwatch
           tags: ${{ env.image }}:${{ env.tag }}
           push: true
+      - uses: ZeitOnline/sysdig-scan-action@bb519dd81d03633da2083b26a58afa9753783d67 # v1.1.0
+        with:
+          gha_vault_role: ${{steps.baseproject.outputs.gha_vault_role}}
+          image_tag: ${{ env.image }}:${{ env.tag }}
       - name: Run tests
         if: github.ref_name != 'main'
         run: |
