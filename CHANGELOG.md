@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.3.0...2.4.0) (2025-07-17)
+
+
+### Features
+
+* **nightwatch:** scan for security issues [BEM-216] ([a65b938](https://github.com/ZeitOnline/gh-action-workflows/commit/a65b938f2336c0c3308f26f9612c01ce52d9c610))
+* **nightwatch:** support pypi-zon mirror [BEM-210] ([b624be2](https://github.com/ZeitOnline/gh-action-workflows/commit/b624be254d04eb0aa1e64ca2b0f30690e6bf5934))
+
 ## [2.3.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.2.1...2.3.0) (2025-05-23)
 
 
