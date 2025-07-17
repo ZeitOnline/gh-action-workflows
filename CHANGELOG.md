@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.4.0...2.4.1) (2025-07-17)
+
+
+### Bug Fixes
+
+* **nighwatch:** scan security only on PRs not main ([cc11024](https://github.com/ZeitOnline/gh-action-workflows/commit/cc11024ef6960f4653fb4c2faca65d6631f0afe0))
+
 ## [2.4.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.3.0...2.4.0) (2025-07-17)
 
 
