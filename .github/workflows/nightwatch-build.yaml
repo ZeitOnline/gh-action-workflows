@@ -96,6 +96,7 @@ jobs:
           secrets: |
             GCLOUD_TOKEN=${{ steps.baseproject.outputs.gcloud_access_token }}
       - uses: ZeitOnline/sysdig-scan-action@bb519dd81d03633da2083b26a58afa9753783d67 # v1.1.0
+        if: github.ref_name != 'main'
         with:
           gha_vault_role: ${{steps.baseproject.outputs.gha_vault_role}}
           image_tag: ${{ env.image }}:${{ env.tag }}
