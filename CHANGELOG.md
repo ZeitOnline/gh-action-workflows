@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.2](https://github.com/ZeitOnline/gh-action-workflows/compare/2.4.1...2.4.2) (2025-08-21)
+
+
+### Miscellaneous Chores
+
+* upgrade package dependencies ([7ed868a](https://github.com/ZeitOnline/gh-action-workflows/commit/7ed868a11bcdc08cfd63a926e62ebf1ae33e53ef))
+
 ## [2.4.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.4.0...2.4.1) (2025-07-17)
 
 
