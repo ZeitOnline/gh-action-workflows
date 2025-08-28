@@ -47,7 +47,7 @@ jobs:
 
       - name: Baseproject
         id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@4743a3673ac263f36b4d2206eb4342c4c44a38e6 # v0
+        uses: ZeitOnline/gh-action-baseproject@4a35b6f8614aab8320249d6778ed6d2edd4a40c3 # v0
         with:
             project_name: ${{ env.project }}
             environment: production
