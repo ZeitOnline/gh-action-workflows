@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.4.2...2.5.0) (2025-08-29)
+
+
+### Features
+
+* **commit-lint:** add inputs to commit-lint workflow ([#48](https://github.com/ZeitOnline/gh-action-workflows/issues/48)) ([db20672](https://github.com/ZeitOnline/gh-action-workflows/commit/db20672a26f1c809d1710d4b98632d2c48385d62))
+* **commit-lint:** allow passing config etc. to the commit-lint workflow ([c3bcc14](https://github.com/ZeitOnline/gh-action-workflows/commit/c3bcc1453d721ec6ebe73ff456c3ea1316b40f49))
+
 ## [2.4.2](https://github.com/ZeitOnline/gh-action-workflows/compare/2.4.1...2.4.2) (2025-08-21)
 
 
