@@ -1,6 +1,31 @@
 name: Test commit messages
 on:
   workflow_call:
+    inputs:
+      configFile:
+        description: "The path to your commitlint config file"
+        required: false
+        type: string
+        default: "commitlint.config.mjs"
+      failOnWarnings:
+        description: "Whether you want to fail on warnings or not"
+        required: false
+        type: boolean
+        default: false
+      failOnErrors:
+        description: "Whether you want to fail on errors or not"
+        required: false
+        type: boolean
+        default: true
+      helpURL:
+        description: "Link to a page explaining your commit message convention"
+        required: false
+        type: string
+        default: "https://github.com/conventional-changelog/commitlint/#what-is-commitlint"
+      commitDepth:
+        description: "When set to a valid Integer value - X, considers only the latest X number of commits"
+        required: false
+        type: number
 jobs:
   commitlint:
     name: Commit-Lint
@@ -10,3 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6
+        with:
+          configFile: ${{ inputs.configFile }}
+          failOnWarnings: ${{ inputs.failOnWarnings }}
+          failOnErrors: ${{ inputs.failOnErrors }}
+          helpURL: ${{ inputs.helpURL }}
+          commitDepth: ${{ inputs.commitDepth }}
