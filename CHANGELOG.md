@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.6.0...2.6.1) (2025-10-02)
+
+
+### Bug Fixes
+
+* **pre-commit:** show diff on failure to aid debugging ([6dda9aa](https://github.com/ZeitOnline/gh-action-workflows/commit/6dda9aa7e9f44d471149951b202884a3e3a77fc2))
+
 ## [2.6.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.5.0...2.6.0) (2025-10-02)
 
 
