@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.5.0...2.6.0) (2025-10-02)
+
+
+### Features
+
+* **pre-commit:** support installing dependency runtimes (python, nodejs) ([#51](https://github.com/ZeitOnline/gh-action-workflows/issues/51)) ([784ba2f](https://github.com/ZeitOnline/gh-action-workflows/commit/784ba2fc2056ffa05642b9a3eb67b2644882c8a1))
+
 ## [2.5.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.4.2...2.5.0) (2025-08-29)
 
 
