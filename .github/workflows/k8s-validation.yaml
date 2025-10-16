@@ -1,6 +1,12 @@
 name: K8s validation
 on:
   workflow_call:
+    inputs:
+      environments:
+        description: "space-separated list of environments to validate (e.g. 'staging production')"
+        default: "staging production"
+        required: true
+        type: string
 jobs:
   validate:
     name: Validate manifests
@@ -15,8 +21,9 @@ jobs:
     - name: Generate manifests
       run: |
         mkdir manifests
-        kubectl kustomize k8s/staging > manifests/staging.yaml
-        kubectl kustomize k8s/production > manifests/production.yaml
+        for env in ${{ inputs.environments }}; do
+          kubectl kustomize k8s/$env > manifests/$env.yaml
+        done
     - name: Validate manifests
       uses: instrumenta/kubeval-action@master
       with:
