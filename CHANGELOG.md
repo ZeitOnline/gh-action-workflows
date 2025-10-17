@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.8.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.7.0...2.8.0) (2025-10-17)
+
+
+### Features
+
+* install & run 'pre-commit' using `uv(x)` ([#56](https://github.com/ZeitOnline/gh-action-workflows/issues/56)) ([9d4de6a](https://github.com/ZeitOnline/gh-action-workflows/commit/9d4de6a8c4d32cf9118412c915aaa55f0e94f110))
+
+
+### Bug Fixes
+
+* **k8s-validation:** use 'staging' and 'production' by default ([0c6b13e](https://github.com/ZeitOnline/gh-action-workflows/commit/0c6b13ed7b8bab4ecba4b746af12b743d25b0462)), closes [#33](https://github.com/ZeitOnline/gh-action-workflows/issues/33)
+
 ## [2.7.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.6.1...2.7.0) (2025-10-17)
 
 
