@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.7.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.6.1...2.7.0) (2025-10-17)
+
+
+### Features
+
+* **k8s-validation:** add input to be flexible which environments to validate ([#33](https://github.com/ZeitOnline/gh-action-workflows/issues/33)) ([38cfaa9](https://github.com/ZeitOnline/gh-action-workflows/commit/38cfaa937e982a51ccf1adb6aa43be8c710b0834))
+
+
+### Bug Fixes
+
+* **pre-commit:** make pre-commit actually use the node we just installed, sigh ([#57](https://github.com/ZeitOnline/gh-action-workflows/issues/57)) ([5245d81](https://github.com/ZeitOnline/gh-action-workflows/commit/5245d81a34fa5a3193bb1f022bc31d01a4aec5fb))
+
 ## [2.6.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.6.0...2.6.1) (2025-10-02)
 
 
