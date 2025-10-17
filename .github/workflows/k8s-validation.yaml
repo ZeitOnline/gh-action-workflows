@@ -5,7 +5,7 @@ on:
       environments:
         description: "space-separated list of environments to validate (e.g. 'staging production')"
         default: "staging production"
-        required: true
+        required: false
         type: string
 jobs:
   validate:
