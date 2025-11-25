@@ -77,7 +77,7 @@ jobs:
           echo "image=${{ vars.GAR_DOCKER_REGISTRY }}/$project-nightwatch" >> "$GITHUB_ENV"
           echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
-        uses: ZeitOnline/gh-action-baseproject@4a35b6f8614aab8320249d6778ed6d2edd4a40c3 # v0
+        uses: ZeitOnline/gh-action-baseproject@v0
         id: baseproject
         with:
           project_name: ${{ env.project }}
