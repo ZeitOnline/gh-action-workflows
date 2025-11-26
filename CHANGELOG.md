@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.9.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.8.0...2.9.0) (2025-11-26)
+
+
+### Features
+
+* **nightwatch:** pass cluster to baseproject action ([#68](https://github.com/ZeitOnline/gh-action-workflows/issues/68)) ([1fcc48b](https://github.com/ZeitOnline/gh-action-workflows/commit/1fcc48b5389e635ae3cb620feefc0f56112b1aff))
+
 ## [2.8.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.7.0...2.8.0) (2025-10-17)
 
 
