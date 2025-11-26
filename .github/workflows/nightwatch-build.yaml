@@ -21,6 +21,8 @@ name: Build nightwatch tests
 #     with:
 #       versions: smoketest/k8s/versions
 #       project: MYPROJECT
+#       environment: staging
+#       gke_cluster: my-cluster
 
 on:
   workflow_call:
@@ -29,9 +31,11 @@ on:
         required: false
         type: string
       environment:
-        required: false
+        required: true
         type: string
-        default: staging
+      gke_cluster:
+        required: true
+        type: string
       args:
         required: false
         type: string
@@ -83,6 +87,7 @@ jobs:
           project_name: ${{ env.project }}
           environment: ${{ inputs.environment }}
           gke_auth: true
+          gke_cluster: ${{ inputs.gke_cluster }}
           google_auth: true
           gar_docker_auth: true
           vault_export_token: true
