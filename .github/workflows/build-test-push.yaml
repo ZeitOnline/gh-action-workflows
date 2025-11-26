@@ -97,7 +97,7 @@ jobs:
           echo "describe=$( git describe --tags )" >> "$GITHUB_ENV"
       - name: Setup auth
         id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@33c193b385a736184a1230cffe5ee5d1c9891da5 # v0
         if: inputs.targets
         with:
           project_name: ${{ env.project }}
