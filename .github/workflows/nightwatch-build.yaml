@@ -20,6 +20,7 @@ name: Build nightwatch tests
 #     secrets: inherit
 #     with:
 #       versions: smoketest/k8s/versions
+#       registry: k8s/base/registry
 #       project: MYPROJECT
 #       environment: staging
 #       gke_cluster: my-cluster
@@ -46,6 +47,11 @@ on:
                 "secretRef": {"name": "nightwatch-secrets", "optional": true}}]}
           ]'
       versions:
+        description: directory in which to run `kustomize edit set-image`
+        required: false
+        type: string
+      registry:
+        description: directory that contains a kustomization.yaml translating `nightwatch` to the full image name
         required: false
         type: string
     outputs:
@@ -78,7 +84,11 @@ jobs:
           default="${repository##*/}"
           project="${input:-$default}"
           echo "project=$project" >> "$GITHUB_ENV"
-          echo "image=${{ vars.GAR_DOCKER_REGISTRY }}/$project-nightwatch" >> "$GITHUB_ENV"
+          if [[ -n "${{ inputs.registry }}"]]; then
+              echo "image=$(awk -F': ' '$2 == "nightwatch" { l=NR } l && NR==l+1 { print $2 }' < ${{ inputs.registry }}/kustomization.yaml)" >> "$GITHUB_ENV"
+          else
+              echo "image=${{ vars.GAR_DOCKER_REGISTRY }}/$project-nightwatch" >> "$GITHUB_ENV"
+          fi
           echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
         uses: ZeitOnline/gh-action-baseproject@v0
