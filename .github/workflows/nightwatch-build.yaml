@@ -35,7 +35,7 @@ on:
         required: true
         type: string
       gke_cluster:
-        required: true
+        required: false
         type: string
       args:
         required: false
@@ -94,7 +94,7 @@ jobs:
           project_name: ${{ env.project }}
           environment: ${{ inputs.environment }}
           gke_auth: true
-          gke_cluster: ${{ inputs.gke_cluster }}
+          gke_cluster: ${{ inputs.gke_cluster || inputs.environment }}
           google_auth: true
           gar_docker_auth: true
           vault_export_token: true
