@@ -32,8 +32,9 @@ on:
         required: false
         type: string
       environment:
-        required: true
+        required: false
         type: string
+        default : staging
       gke_cluster:
         required: false
         type: string
