@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.10.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.9.0...2.10.0) (2025-12-02)
+
+
+### Features
+
+* **nightwatch:** read image name from project kustomization ([#70](https://github.com/ZeitOnline/gh-action-workflows/issues/70)) ([3c04aba](https://github.com/ZeitOnline/gh-action-workflows/commit/3c04abaeeb2ecefac784fcb8f2f86680204acd5e))
+
 ## [2.9.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.8.0...2.9.0) (2025-11-26)
 
 
