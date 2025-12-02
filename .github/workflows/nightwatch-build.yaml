@@ -20,7 +20,7 @@ name: Build nightwatch tests
 #     secrets: inherit
 #     with:
 #       versions: smoketest/k8s/versions
-#       registry: k8s/base/registry
+#       k8s_base: smoketest/k8s
 #       project: MYPROJECT
 #       environment: staging
 #       gke_cluster: my-cluster
@@ -32,10 +32,11 @@ on:
         required: false
         type: string
       environment:
-        required: true
+        required: false
         type: string
+        default : staging
       gke_cluster:
-        required: true
+        required: false
         type: string
       args:
         required: false
@@ -50,10 +51,11 @@ on:
         description: directory in which to run `kustomize edit set-image`
         required: false
         type: string
-      registry:
-        description: directory that contains a kustomization.yaml translating `nightwatch` to the full image name
+      k8s_base:
+        description: directory that contains a k8s manifest containing the final image name
         required: false
         type: string
+        default: k8s
     outputs:
       tag:
         description: "Tag of built 'nightwatch' image"
@@ -84,11 +86,7 @@ jobs:
           default="${repository##*/}"
           project="${input:-$default}"
           echo "project=$project" >> "$GITHUB_ENV"
-          if [[ -n "${{ inputs.registry }}"]]; then
-              echo "image=$(awk -F': ' '$2 == "nightwatch" { l=NR } l && NR==l+1 { print $2 }' < ${{ inputs.registry }}/kustomization.yaml)" >> "$GITHUB_ENV"
-          else
-              echo "image=${{ vars.GAR_DOCKER_REGISTRY }}/$project-nightwatch" >> "$GITHUB_ENV"
-          fi
+          echo "image=$( kustomize build ${{inputs.k8s_base}}/${{ inputs.environment }} | awk -F: '/image: .*nightwatch/ { print $2 }' | tr -d ' ' )" >> "$GITHUB_ENV"
           echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
         uses: ZeitOnline/gh-action-baseproject@v0
@@ -97,7 +95,7 @@ jobs:
           project_name: ${{ env.project }}
           environment: ${{ inputs.environment }}
           gke_auth: true
-          gke_cluster: ${{ inputs.gke_cluster }}
+          gke_cluster: ${{ inputs.gke_cluster || inputs.environment }}
           google_auth: true
           gar_docker_auth: true
           vault_export_token: true
