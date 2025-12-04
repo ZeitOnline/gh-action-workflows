@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.10.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.10.0...2.10.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* **nightwatch:** handle duplicate, but identical image names ([5ebbfd5](https://github.com/ZeitOnline/gh-action-workflows/commit/5ebbfd57f34983593f9eccf627e6024cccacc11e)), closes [#70](https://github.com/ZeitOnline/gh-action-workflows/issues/70)
+
 ## [2.10.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.9.0...2.10.0) (2025-12-02)
 
 
