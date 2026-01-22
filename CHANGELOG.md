@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.10.1...2.11.0) (2026-01-22)
+
+
+### Features
+
+* **linter:** add workflow to run 'pre-commit' checks with 'lefthook' ([#80](https://github.com/ZeitOnline/gh-action-workflows/issues/80)) ([008fb5b](https://github.com/ZeitOnline/gh-action-workflows/commit/008fb5b7eee1a9a374c15c4049ece4218b4fb6c8))
+
 ## [2.10.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.10.0...2.10.1) (2025-12-04)
 
 
