@@ -9,6 +9,9 @@ on:
       setup-command:
         description: "Optional command to set up plugins etc"
         type: string
+      uv-options:
+        description: "Optional arguments to pass to `uv run`"
+        type: string
 jobs:
   linter:
     name: Lefthook
@@ -26,4 +29,4 @@ jobs:
         if: inputs.setup-command
         run: ${{ inputs.setup-command }}
       - name: Run code checks
-        run: uvx lefthook run pre-commit --all-files
+        run: uv run ${{ inputs.uv-options }} lefthook run pre-commit --all-files
