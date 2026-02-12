@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.0...2.11.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* **lefthook:** switch to `uv run` and allow passing extra options ([#87](https://github.com/ZeitOnline/gh-action-workflows/issues/87)) ([503741b](https://github.com/ZeitOnline/gh-action-workflows/commit/503741b4600e8fa4027ebba7fc006aff51cb418b))
+
 ## [2.11.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.10.1...2.11.0) (2026-01-22)
 
 
