@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.3](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.2...2.11.3) (2026-02-17)
+
+
+### Bug Fixes
+
+* **linter:** don't install Node.js by default after all ([#91](https://github.com/ZeitOnline/gh-action-workflows/issues/91)) ([0bc708a](https://github.com/ZeitOnline/gh-action-workflows/commit/0bc708a86e3c86d97601a3e6063a5b3e96684843))
+
 ## [2.11.2](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.1...2.11.2) (2026-02-17)
 
 
