@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.2](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.1...2.11.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* **lefthook:** use `setup-command` to install tools (via `uv`) ([#89](https://github.com/ZeitOnline/gh-action-workflows/issues/89)) ([2a117fa](https://github.com/ZeitOnline/gh-action-workflows/commit/2a117fa005f5e88980fb7c3736fd7a64aa965818)), closes [#87](https://github.com/ZeitOnline/gh-action-workflows/issues/87)
+
 ## [2.11.1](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.0...2.11.1) (2026-02-12)
 
 
