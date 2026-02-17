@@ -7,11 +7,9 @@ on:
         type: string
         default: "24"
       setup-command:
-        description: "Optional command to set up plugins etc"
+        description: "Optional command to set up tools, plugins etc"
         type: string
-      uv-options:
-        description: "Optional arguments to pass to `uv run`"
-        type: string
+        default: "uv sync --frozen --only-group lint"
 jobs:
   linter:
     name: Lefthook
@@ -21,12 +19,13 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Install `uv`
         uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+        with:
+          activate-environment: true
       - name: Install Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: ${{inputs.node-version}}
       - name: Run setup command
-        if: inputs.setup-command
         run: ${{ inputs.setup-command }}
       - name: Run code checks
-        run: uv run ${{ inputs.uv-options }} lefthook run pre-commit --all-files
+        run: lefthook run pre-commit --all-files
