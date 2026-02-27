@@ -19,17 +19,14 @@ on:
         required: false
         type: string
         default: testing.yaml
-      compose_args:
-        required: false
-        type: string
       test_args:
         required: false
         type: string
-        default: --verbose --junitxml=/testing/junit.xml
+        default: -- --verbose --junitxml=/testing/junit.xml
       artifacts:
         required: false
         type: string
-      docker_context:
+      build_args:
         required: false
         type: string
         default: .
@@ -51,13 +48,9 @@ jobs:
           fetch-depth: 0
           submodules: true
       # build images, run tests and handle artifacts
-      - name: Build images
-        run: |
-          docker compose build ${{ inputs.service }}
       - name: Run tests
         run: |
-          docker compose run --rm ${{ inputs.compose_args }} ${{ inputs.service }} \
-            -- ${{ inputs.test_args }}
+          docker compose run --build --rm ${{ inputs.service }} ${{ inputs.test_args }}
       - name: Publish test result
         uses: enricomi/publish-unit-test-result-action@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2
         if: always()
@@ -99,7 +92,7 @@ jobs:
         run: |
           for target in ${{ inputs.targets }}; do
             tag="${{ env.prefix }}-$target:${{ env.describe }}"
-            docker build --target $target --tag $tag ${{ inputs.docker_context }}
+            docker build --target $target --tag $tag ${{ inputs.build_args }}
             docker push $tag
           done
       # update image versions for 'staging'
