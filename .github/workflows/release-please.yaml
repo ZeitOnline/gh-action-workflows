@@ -1,0 +1,32 @@
+name: Release
+on:
+  workflow_call:
+    outputs:
+      release_created:
+        description: Indicator if a release was created
+        value: ${{ jobs.release-please.outputs.release_created }}
+      tag_name:
+        description: Release version tag if any
+        value: ${{ jobs.release-please.outputs.tag_name }}
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+concurrency:
+  group: release
+  cancel-in-progress: true
+jobs:
+  release-please:
+    name: Release please
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Release please
+        id: release
+        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4

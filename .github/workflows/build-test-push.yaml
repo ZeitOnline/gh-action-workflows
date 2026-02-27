@@ -19,27 +19,17 @@ on:
         required: false
         type: string
         default: testing.yaml
-      compose_args:
-        required: false
-        type: string
       test_args:
         required: false
         type: string
-        default: --verbose --junitxml=/testing/junit.xml
+        default: -- --verbose --junitxml=/testing/junit.xml
       artifacts:
         required: false
         type: string
-      docker_context:
+      build_args:
         required: false
         type: string
         default: .
-    outputs:
-      release_created:
-        description: Indicator if a release was created
-        value: ${{ jobs.test-and-push.outputs.release_created }}
-      tag_name:
-        description: Release version tag if any
-        value: ${{ jobs.test-and-push.outputs.tag_name }}
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
@@ -51,9 +41,6 @@ jobs:
       contents: write
       checks: write
       pull-requests: write
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -61,13 +48,9 @@ jobs:
           fetch-depth: 0
           submodules: true
       # build images, run tests and handle artifacts
-      - name: Build images
-        run: |
-          docker compose build ${{ inputs.service }}
       - name: Run tests
         run: |
-          docker compose run --rm ${{ inputs.compose_args }} ${{ inputs.service }} \
-            -- ${{ inputs.test_args }}
+          docker compose run --build --rm ${{ inputs.service }} ${{ inputs.test_args }}
       - name: Publish test result
         uses: enricomi/publish-unit-test-result-action@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2
         if: always()
@@ -103,46 +86,39 @@ jobs:
           project_name: ${{ env.project }}
           environment: production     # needs 'production' service account
           gar_docker_auth: true
-      # update release pull request or create release (if merged)
-      - name: Release please
-        id: release
-        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
-        if: inputs.targets
-      # publish images depending on release
+      # build & publish images
       - name: Publish images
         if: inputs.targets
         run: |
-          version="${{ steps.release.outputs.release_created && steps.release.outputs.tag_name || env.describe }}"
           for target in ${{ inputs.targets }}; do
-            tag="${{ env.prefix }}-$target:$version"
-            docker build --target $target --tag $tag ${{ inputs.docker_context }}
+            tag="${{ env.prefix }}-$target:${{ env.describe }}"
+            docker build --target $target --tag $tag ${{ inputs.build_args }}
             docker push $tag
           done
-      # in case of a release any versions should be set via `extra-files`
-      # otherwise the image versions are updated for 'staging'
+      # update image versions for 'staging'
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
-        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
+        if: ${{ inputs.versions }}
         with:
           gpg_private_key: ${{ secrets.ZON_OPS_GPG_KEY_PRIVATE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2
-        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
+        if: ${{ inputs.versions }}
       - name: Pull recent changes
-        if: ${{ inputs.versions && !steps.release.outputs.release_created && github.ref_type == 'branch' }}
+        if: ${{ inputs.versions }}
         run: |
           git pull
       - name: Set image tags
-        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
+        if: ${{ inputs.versions }}
         run: |
           cd ${{ inputs.versions }}
           for target in ${{ inputs.targets }}; do
             kustomize edit set image $target:${{ env.describe }}
           done
       - name: Commit and push image tags
-        if: ${{ inputs.versions && !steps.release.outputs.release_created }}
+        if: ${{ inputs.versions }}
         run: |
           git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
           git push

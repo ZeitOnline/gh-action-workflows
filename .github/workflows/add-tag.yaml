@@ -1,0 +1,47 @@
+name: Add tag to images
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: false
+        type: string
+      tag:
+        required: true
+        type: string
+      versions:
+        required: false
+        type: string
+        default: k8s/staging/versions/kustomization.yaml
+jobs:
+  add-tag:
+    name: Add tag to docker images
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Set variables
+        run: |
+          input="${{ inputs.project }}"
+          repository="${{ github.repository }}"
+          default="${repository##*/}"
+          project="${input:-$default}"
+          echo "project=$project" >> "$GITHUB_ENV"
+          echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
+      - name: Setup auth
+        uses: ZeitOnline/gh-action-baseproject@v0
+        with:
+          project_name: ${{ env.project }}
+          environment: production     # needs 'production' service account
+          gar_docker_auth: true
+      - name: Add tag
+        run: |
+          awk '
+            /- name:/ { image = ENVIRON["prefix"] "-" $3 }
+            /newTag:/ { print "gcloud artifacts docker tags add", image ":" $2, image ":${{ inputs.tag }}" }
+          ' ${{ inputs.versions }} | bash
