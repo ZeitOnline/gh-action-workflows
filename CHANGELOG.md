@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.3...3.0.0) (2026-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* the 'build-test-push' workflow no longer runs "release-please" nor deploys to 'production'
+
+### Features
+
+* allow to re-tag images for 'production' deployments ([#95](https://github.com/ZeitOnline/gh-action-workflows/issues/95)) ([08a83f1](https://github.com/ZeitOnline/gh-action-workflows/commit/08a83f14511be41827863278a14a5a19e2f4094d))
+
 ## [2.11.3](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.2...2.11.3) (2026-02-17)
 
 
