@@ -10,7 +10,7 @@ Reusable GitHub Actions workflows for CI/CD pipelines at ZeitOnline.
 - [**commit-lint**](#commit-lint) — Lint commit messages using [commitlint](https://commitlint.js.org/)
 - [**lefthook**](#lefthook) — Run pre-commit code checks via [Lefthook](https://github.com/evilmartians/lefthook)
 - [**pre-commit**](#pre-commit) — Run code checks via [pre-commit](https://pre-commit.com/)
-- [**k8s-validation**](#k8s-validation) — Validate Kubernetes manifests using kubeval
+- [**k8s-validation**](#k8s-validation) — Validate Kubernetes manifests using [kubeval](https://www.kubeval.com/)
 - [**nightwatch-build**](#nightwatch-build) — Build, push and run Nightwatch smoke test images
 - [**release-notification**](#release-notification) — Notify Slack and Prometheus about deployments
 
@@ -51,7 +51,7 @@ Adds an additional tag (typically the release version) to images that already ex
 
 ## release-please
 
-Runs [Release Please](https://github.com/googleapis/release-please) to manage versioned releases via conventional commits. Can be used both as a reusable workflow (via `workflow_call`) and standalone (triggered on push to `main` or `workflow_dispatch`). Outputs whether a release was created and the tag name, so callers can decide between a staging build or a production re-tag.
+Runs [Release Please](https://github.com/googleapis/release-please) to manage versioned releases via conventional commits. Can be used both as a reusable workflow (via `workflow_call`) and standalone (triggered on push to `main` or via `workflow_dispatch` to create releases for this repo itself). Outputs whether a release was created and the tag name, so callers can decide between a staging build or a production re-tag.
 
 ### Outputs
 
@@ -80,7 +80,7 @@ Validates commit messages against [conventional commit](https://www.conventional
 
 ## lefthook
 
-Runs code quality checks using [Lefthook](https://github.com/evilmartians/lefthook) (as a replacement for pre-commit). Sets up `uv` and optionally Node.js, then executes `lefthook run pre-commit --all-files`.
+Runs code quality checks using [Lefthook](https://github.com/evilmartians/lefthook) (as a replacement for the [pre-commit](#pre-commit) workflow below). Sets up `uv` and optionally Node.js, then executes `lefthook run pre-commit --all-files`.
 
 ### Inputs
 
@@ -118,7 +118,7 @@ Validates Kubernetes manifests by running `kubectl kustomize` for each environme
 
 ## nightwatch-build
 
-Builds a Nightwatch.js smoke test Docker image, pushes it to GAR, runs a security scan (on PRs), and executes the tests in a Kubernetes pod. On `main`, it updates the image tag in Kustomize and commits it back.
+Builds a Docker image containing per project "smoke" or "nightwatch" tests, pushes it to GAR, runs a security scan (on PRs), and executes the tests in a Kubernetes pod. On `main`, it updates the image tag in Kustomize and commits it back.
 
 ### Inputs
 
@@ -141,7 +141,7 @@ Builds a Nightwatch.js smoke test Docker image, pushes it to GAR, runs a securit
 
 ## release-notification
 
-Posts a deployment notification to Slack (via hackbot) and pushes a deployment timestamp metric to Prometheus (via pushgateway).
+Posts a deployment notification to Slack (via Hackbot) and pushes a deployment timestamp metric to Prometheus (via pushgateway).
 
 ### Inputs
 
