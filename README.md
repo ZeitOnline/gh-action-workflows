@@ -2,6 +2,78 @@
 
 Reusable GitHub Actions workflows for CI/CD pipelines at ZeitOnline.
 
+## Overview
+
+The workflows provided here are intended for two main purposes, (continuously) deploying projects and creating releases for them as well as building and deploying so called "nightwatch" tests that are meant to help with monitoring the health/status of said projects.
+
+The first use-case uses a number of them as building bricks and for a project-specific CI/CD workflow that typically looks like this:
+
+``` yaml title=".github/workflows/backend-ci.yaml"
+name: Backend CI
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+concurrency:
+  group: backend
+  cancel-in-progress: true
+jobs:
+  linter:
+    uses: zeitonline/gh-action-workflows/.github/workflows/lefthook.yaml
+  k8s:
+    uses: zeitonline/gh-action-workflows/.github/workflows/k8s-validation.yaml
+  # run 'release-please' first
+  release-please:
+    needs: [linter, k8s]
+    uses: zeitonline/gh-action-workflows/.github/workflows/release-please.yaml
+    secrets: inherit
+  # without release: build new images for 'staging'
+  build:
+    needs: release-please
+    if: ${{ ! needs.release-please.outputs.release_created }}
+    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml
+    secrets: inherit
+    with:
+      targets: postgrest migrator
+      versions: k8s/staging/versions
+  # with release: promote images to 'production' and notify
+  promote-images:
+    needs: release-please
+    if: needs.release-please.outputs.release_created
+    uses: zeitonline/gh-action-workflows/.github/workflows/add-tag.yaml
+    secrets: inherit
+    with:
+      tag: ${{ needs.release-please.outputs.tag_name }}
+  notify:
+    needs: release-please
+    if: needs.release-please.outputs.release_created
+    uses: zeitonline/gh-action-workflows/.github/workflows/release-notification.yaml
+    secrets: inherit
+    with:
+      environment: production
+      version: ${{ needs.release-please.outputs.tag_name }}
+      emoji: tada
+```
+
+The second just uses [nightwatch-build](#nightwatch-build) to build, test and push updated "nightwatch" images. It is typically used like this:
+
+``` yaml title=".github/workflows/nightwatch-build.yaml"
+name: Build nightwatch tests
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'smoketest/**'
+jobs:
+  build:
+    uses: zeitonline/gh-action-workflows/.github/workflows/nightwatch-build.yaml
+    secrets: inherit
+    with:
+      versions: k8s/base/nightwatch/versions
+      gke_cluster: main-staging-25-01
+```
+
 ## Workflows
 
 - [**build-test-push**](#build-test-push) — Build, test and push Docker images for staging deployments
