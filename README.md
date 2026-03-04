@@ -88,11 +88,11 @@ jobs:
 
 ---
 
-## build-test-push
+### build-test-push
 
 Runs tests inside Docker Compose, publishes test results, then builds and pushes multi-target Docker images to Google Artifact Registry. When a `versions` directory is provided, it also updates the Kustomize image tags and commits them back — intended for automatic staging deployments.
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -107,11 +107,11 @@ Runs tests inside Docker Compose, publishes test results, then builds and pushes
 
 ---
 
-## add-tag
+### add-tag
 
 Adds an additional tag (typically the release version) to images that already exist in Google Artifact Registry. This enables production deployments by re-using the exact same images that were previously built and tested for staging — without rebuilding them.
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -121,11 +121,11 @@ Adds an additional tag (typically the release version) to images that already ex
 
 ---
 
-## release-please
+### release-please
 
 Runs [Release Please](https://github.com/googleapis/release-please) to manage versioned releases via conventional commits. Can be used both as a reusable workflow (via `workflow_call`) and standalone (triggered on push to `main` or via `workflow_dispatch` to create releases for this repo itself). Outputs whether a release was created and the tag name, so callers can decide between a staging build or a production re-tag.
 
-### Outputs
+#### Outputs
 
 | Name | Description |
 |------|-------------|
@@ -134,11 +134,11 @@ Runs [Release Please](https://github.com/googleapis/release-please) to manage ve
 
 ---
 
-## commit-lint
+### commit-lint
 
 Validates commit messages against [conventional commit](https://www.conventionalcommits.org/) rules using `commitlint`.
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -150,11 +150,11 @@ Validates commit messages against [conventional commit](https://www.conventional
 
 ---
 
-## lefthook
+### lefthook
 
 Runs code quality checks using [Lefthook](https://github.com/evilmartians/lefthook) (as a replacement for the [pre-commit](#pre-commit) workflow below). Sets up `uv` and optionally Node.js, then executes `lefthook run pre-commit --all-files`.
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -163,11 +163,11 @@ Runs code quality checks using [Lefthook](https://github.com/evilmartians/leftho
 
 ---
 
-## pre-commit
+### pre-commit
 
 Runs [pre-commit](https://pre-commit.com/) hooks via `uvx`. Optionally sets up Python and/or Node.js runtimes for hooks that need them.
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -176,11 +176,11 @@ Runs [pre-commit](https://pre-commit.com/) hooks via `uvx`. Optionally sets up P
 
 ---
 
-## k8s-validation
+### k8s-validation
 
 Validates Kubernetes manifests by running `kubectl kustomize` for each environment and checking the output with [kubeval](https://www.kubeval.com/).
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -188,11 +188,11 @@ Validates Kubernetes manifests by running `kubectl kustomize` for each environme
 
 ---
 
-## nightwatch-build
+### nightwatch-build
 
 Builds a Docker image containing per project "smoke" or "nightwatch" tests, pushes it to GAR, runs a security scan (on PRs), and executes the tests in a Kubernetes pod. On `main`, it updates the image tag in Kustomize and commits it back.
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
@@ -203,7 +203,7 @@ Builds a Docker image containing per project "smoke" or "nightwatch" tests, push
 | `versions` | no | — | Kustomize directory for updating image tags |
 | `k8s_base` | no | `k8s` | Directory containing the Kustomize base with the image name |
 
-### Outputs
+#### Outputs
 
 | Name | Description |
 |------|-------------|
@@ -211,11 +211,11 @@ Builds a Docker image containing per project "smoke" or "nightwatch" tests, push
 
 ---
 
-## release-notification
+### release-notification
 
 Posts a deployment notification to Slack (via Hackbot) and pushes a deployment timestamp metric to Prometheus (via pushgateway).
 
-### Inputs
+#### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
