@@ -19,6 +19,9 @@ on:
         required: false
         type: string
         default: testing.yaml
+      run_args:
+        required: false
+        type: string
       test_args:
         required: false
         type: string
@@ -50,7 +53,7 @@ jobs:
       # build images, run tests and handle artifacts
       - name: Run tests
         run: |
-          docker compose run --build --rm ${{ inputs.service }} ${{ inputs.test_args }}
+          docker compose run --build --rm ${{ inputs.run_args }} ${{ inputs.service }} ${{ inputs.test_args }}
       - name: Publish test result
         uses: enricomi/publish-unit-test-result-action@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2
         if: always()

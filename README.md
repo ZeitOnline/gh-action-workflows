@@ -101,6 +101,7 @@ Runs tests inside Docker Compose, publishes test results, then builds and pushes
 | `targets` | no | — | Space-separated list of Docker build targets to publish |
 | `versions` | no | — | Kustomize directory for updating image tags (staging) |
 | `compose_file` | no | `testing.yaml` | Docker Compose file to use |
+| `run_args` | no | — | Additional Arguments for `docker compose run` |
 | `test_args` | no | `-- --verbose --junitxml=…` | Arguments passed to the test runner |
 | `artifacts` | no | — | Path to extract build artifacts from the container |
 | `build_args` | no | `.` | Additional arguments for `docker build` |
