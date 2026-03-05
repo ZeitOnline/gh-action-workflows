@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/ZeitOnline/gh-action-workflows/compare/3.0.0...3.0.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* restore input for extra arguments for `docker compose run` ([37805e4](https://github.com/ZeitOnline/gh-action-workflows/commit/37805e4b33ccc513a41b02fcae957a6494475c23))
+
 ## [3.0.0](https://github.com/ZeitOnline/gh-action-workflows/compare/2.11.3...3.0.0) (2026-03-04)
 
 
