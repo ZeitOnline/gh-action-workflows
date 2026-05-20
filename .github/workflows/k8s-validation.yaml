@@ -25,6 +25,6 @@ jobs:
           kubectl kustomize k8s/$env > manifests/$env.yaml
         done
     - name: Validate manifests
-      uses: instrumenta/kubeval-action@master
+      uses: instrumenta/kubeval-action@5915e4adba5adccac07cb156b82e54c3fed74921 # master
       with:
         files: manifests
