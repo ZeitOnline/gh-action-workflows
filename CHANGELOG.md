@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/ZeitOnline/gh-action-workflows/compare/3.0.1...3.0.2) (2026-05-20)
+
+
+### Miscellaneous Chores
+
+* upgrade used actions ([1a6b468](https://github.com/ZeitOnline/gh-action-workflows/commit/1a6b4682f84841d34a118b634d03d25935abed93))
+
 ## [3.0.1](https://github.com/ZeitOnline/gh-action-workflows/compare/3.0.0...3.0.1) (2026-03-05)
 
 
