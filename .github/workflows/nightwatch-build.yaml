@@ -34,23 +34,21 @@ on:
       environment:
         required: false
         type: string
-        default : staging
+        default: staging
       gke_cluster:
         required: false
         type: string
-      args:
+        default: main-staging-25-01
+      kustomization:
+        description: directory containing the k8s test manifest
         required: false
         type: string
-        default: |
-          --override-type=json --overrides='[
-            {"op": "add", "path": "/spec/serviceAccount", "value": "baseproject"},
-            {"op": "add", "path": "/spec/containers/0/envFrom", "value": [{
-                "secretRef": {"name": "nightwatch-secrets", "optional": true}}]}
-          ]'
+        default: k8s/base/nightwatch/test
       versions:
         description: directory in which to run `kustomize edit set-image`
         required: false
         type: string
+        default: k8s/base/nightwatch/versions
       k8s_base:
         description: directory that contains a k8s manifest containing the final image name
         required: false
@@ -117,8 +115,11 @@ jobs:
         if: github.ref_name != 'main'
         run: |
           TAG=${{ env.tag }}
+          cd ${{ inputs.kustomization }}
+          kustomize edit set namesuffix $TAG
+          kustomize edit set image nightwatch-test=${{ env.image }}:$TAG
           kubectl config set-context --current --namespace=${{ env.project }}
-          kubectl run nightwatch-test-$TAG --image=${{ env.image }}:$TAG --restart=Never ${{ inputs.args }}
+          kubectl create --kustomize .
           kubectl wait --for=condition=Ready --timeout=120s pods/nightwatch-test-$TAG
           kubectl logs --follow pods/nightwatch-test-$TAG
           sleep 10
@@ -137,5 +138,6 @@ jobs:
       - name: Commit and push image tags
         if: ${{ inputs.versions && github.ref_name == 'main' }}
         run: |
-          git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
+          git add ${{ inputs.versions }}
+          git commit -m "ci: update image versions (``${{ inputs.versions }}``)"
           git push
