@@ -38,15 +38,11 @@ on:
       gke_cluster:
         required: false
         type: string
-      args:
+      kustomization:
+        description: directory containing the k8s test manifest
         required: false
         type: string
-        default: |
-          --override-type=json --overrides='[
-            {"op": "add", "path": "/spec/serviceAccount", "value": "baseproject"},
-            {"op": "add", "path": "/spec/containers/0/envFrom", "value": [{
-                "secretRef": {"name": "nightwatch-secrets", "optional": true}}]}
-          ]'
+        default: k8s/base/nightwatch/test
       versions:
         description: directory in which to run `kustomize edit set-image`
         required: false
@@ -117,8 +113,11 @@ jobs:
         if: github.ref_name != 'main'
         run: |
           TAG=${{ env.tag }}
+          cd ${{ inputs.kustomize }}
+          kustomize edit set namesuffix $TAG
+          kustomize edit set image nightwatch-test=${{ env.image }}:$TAG
           kubectl config set-context --current --namespace=${{ env.project }}
-          kubectl run nightwatch-test-$TAG --image=${{ env.image }}:$TAG --restart=Never ${{ inputs.args }}
+          kubectl create --kustomize .
           kubectl wait --for=condition=Ready --timeout=120s pods/nightwatch-test-$TAG
           kubectl logs --follow pods/nightwatch-test-$TAG
           sleep 10
