@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/ZeitOnline/gh-action-workflows/compare/3.0.2...4.0.0) (2026-06-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **nightwatch:** a k8s manifest for the 'nightwatch' test pods is now required
+
+### Features
+
+* **nightwatch:** use `kustomize` to create test pods ([#117](https://github.com/ZeitOnline/gh-action-workflows/issues/117)) ([b265c82](https://github.com/ZeitOnline/gh-action-workflows/commit/b265c82b9484e2e1a158d7929769d1dbc3dff7dd))
+
 ## [3.0.2](https://github.com/ZeitOnline/gh-action-workflows/compare/3.0.1...3.0.2) (2026-05-20)
 
 
