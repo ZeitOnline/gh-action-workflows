@@ -38,6 +38,7 @@ on:
       gke_cluster:
         required: false
         type: string
+        default: main-staging-25-01
       kustomization:
         description: directory containing the k8s test manifest
         required: false
