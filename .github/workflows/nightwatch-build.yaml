@@ -47,6 +47,7 @@ on:
         description: directory in which to run `kustomize edit set-image`
         required: false
         type: string
+        default: k8s/base/nightwatch/versions
       k8s_base:
         description: directory that contains a k8s manifest containing the final image name
         required: false
@@ -136,5 +137,6 @@ jobs:
       - name: Commit and push image tags
         if: ${{ inputs.versions && github.ref_name == 'main' }}
         run: |
-          git commit -am "ci: update image versions (``${{ inputs.versions }}``)"
+          git add ${{ inputs.versions }}
+          git commit -m "ci: update image versions (``${{ inputs.versions }}``)"
           git push
