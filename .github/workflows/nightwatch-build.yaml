@@ -115,7 +115,7 @@ jobs:
         if: github.ref_name != 'main'
         run: |
           TAG=${{ env.tag }}
-          cd ${{ inputs.kustomize }}
+          cd ${{ inputs.kustomization }}
           kustomize edit set namesuffix $TAG
           kustomize edit set image nightwatch-test=${{ env.image }}:$TAG
           kubectl config set-context --current --namespace=${{ env.project }}
