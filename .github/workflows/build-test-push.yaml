@@ -55,7 +55,7 @@ jobs:
         run: |
           docker compose run --build --rm ${{ inputs.run_args }} ${{ inputs.service }} ${{ inputs.test_args }}
       - name: Publish test result
-        uses: enricomi/publish-unit-test-result-action@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2
+        uses: enricomi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2
         if: always()
         with:
           junit_files: testing/junit.xml
