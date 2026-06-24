@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.0.0...4.1.0) (2026-06-24)
+
+
+### Features
+
+* **build:** scan built images using Sysdig CLI scanner ([#123](https://github.com/ZeitOnline/gh-action-workflows/issues/123)) ([01c9cf8](https://github.com/ZeitOnline/gh-action-workflows/commit/01c9cf8ed4044a025dbfcbf8b875f9e9860bf3b8))
+
 ## [4.0.0](https://github.com/ZeitOnline/gh-action-workflows/compare/3.0.2...4.0.0) (2026-06-04)
 
 
