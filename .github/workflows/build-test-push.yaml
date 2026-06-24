@@ -117,7 +117,7 @@ jobs:
           for target in ${{ inputs.targets }}; do
             tag="${{ env.prefix }}-$target:${{ env.describe }}"
             docker build --target $target --tag $tag ${{ inputs.build_args }}
-            ./sysdig-cli-scanner --apiurl https://eu1.app.sysdig.com/secure --output=json-file=scan-result.json $tag
+            ./sysdig-cli-scanner --apiurl https://eu1.app.sysdig.com/secure --policy=sysdig-best-practices --output=json-file=scan-result.json $tag
             docker push $tag
           done
       # update image versions for 'staging'
