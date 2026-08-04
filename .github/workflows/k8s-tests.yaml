@@ -1,0 +1,55 @@
+name: K8s tests
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "Directory containing the pytest suite (with its own pyproject.toml)"
+        default: "k8s/tests"
+        required: false
+        type: string
+      uv-version:
+        description: "Version of uv to install"
+        default: "0.11.31"
+        required: false
+        type: string
+      project:
+        description: >-
+          GCP project name. When set, authenticate to Google Cloud and expose the
+          private pypi-zon index credentials to uv (needed once the test dependencies –
+          e.g. zeit.k8stesting – live on the private index). Leave empty for suites that
+          only use public dependencies.
+        default: ""
+        required: false
+        type: string
+jobs:
+  pytest:
+    name: Run k8s manifest tests
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Authenticate to Google Cloud
+        id: baseproject
+        if: inputs.project != ''
+        uses: ZeitOnline/gh-action-baseproject@v0
+        with:
+          project_name: ${{ inputs.project }}
+          gar_docker_auth: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          version: ${{ inputs.uv-version }}
+
+      - uses: imranismail/setup-kustomize@53f941b41dca13ed61874bbc6b4b6e1562877530 # v3
+
+      - name: Run pytest
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          UV_INDEX_PYPI_ZON_USERNAME: oauth2accesstoken
+          UV_INDEX_PYPI_ZON_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
+        run: uv run --link-mode=copy pytest
