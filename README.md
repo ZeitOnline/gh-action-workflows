@@ -83,6 +83,7 @@ jobs:
 - [**lefthook**](#lefthook) — Run pre-commit code checks via [Lefthook](https://github.com/evilmartians/lefthook)
 - [**pre-commit**](#pre-commit) — Run code checks via [pre-commit](https://pre-commit.com/)
 - [**k8s-validation**](#k8s-validation) — Validate Kubernetes manifests using [kubeval](https://www.kubeval.com/)
+- [**k8s-tests**](#k8s-tests) — Run the `pytest`-based assertions over the generated Kubernetes manifests
 - [**nightwatch-build**](#nightwatch-build) — Build, push and run Nightwatch smoke test images
 - [**release-notification**](#release-notification) — Notify Slack and Prometheus about deployments
 
@@ -186,6 +187,36 @@ Validates Kubernetes manifests by running `kubectl kustomize` for each environme
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
 | `environments` | no | `staging production` | Space-separated list of environments to validate (expects `k8s/<env>` directories) |
+
+---
+
+### k8s-tests
+
+Runs the `pytest`-based test suite that makes assertions about the generated Kubernetes
+manifests (rendered via `kustomize`). The suite lives in its own directory with its own
+`pyproject.toml` and typically builds on the [`zeit.k8stesting`](https://github.com/ZeitOnline/zeit.k8stesting)
+plugin, which contributes the shared policy tests. This complements [k8s-validation](#k8s-validation)
+(schema validation): validation checks that the manifests are *valid*, these tests check
+that they are *correct* for our conventions (variant `-pgXX` suffixes, placeholder
+replacement, PGSERVICE routing, …).
+
+#### Inputs
+
+| Name | Required | Default | Description |
+|------|----------|---------|-------------|
+| `working-directory` | no | `k8s/tests` | Directory containing the pytest suite (with its own `pyproject.toml`) |
+| `uv-version` | no | `0.11.31` | Version of `uv` to install |
+| `project` | no | — | GCP project name. When set, authenticates to Google Cloud and exposes the private `pypi-zon` index credentials to `uv` (needed once the test dependencies live on the private index). Leave empty for suites that only use public dependencies. |
+
+#### Example
+
+``` yaml
+jobs:
+  k8s-tests:
+    uses: zeitonline/gh-action-workflows/.github/workflows/k8s-tests.yaml
+    with:
+      project: premium-services
+```
 
 ---
 
