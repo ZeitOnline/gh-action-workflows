@@ -1,0 +1,162 @@
+name: K8s policy tests
+# Für einfache Projekte OHNE projekteigene kustomize_jq-Tests: dieser Workflow legt ein
+# flüchtiges k8s/tests/ an (aus den Inputs) und führt die generische zeit.k8stesting-Suite
+# (A1-A8) aus. Projekte mit eigener Test-Suite nutzen stattdessen k8s-tests.yaml.
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: "GCP/baseproject-Identität des aufrufenden Repos (für pypi-zon-Auth)"
+        required: true
+        type: string
+      environment:
+        description: "baseproject-Environment"
+        default: "production"
+        required: false
+        type: string
+      environments:
+        description: "kustomize-Umgebungen (leerraumgetrennt), über die parametrisiert wird"
+        default: "devel staging production"
+        required: false
+        type: string
+      overlays_dir:
+        description: "Verzeichnis der kustomize-Overlays (enthält je Umgebung ein Unterverzeichnis)"
+        default: "k8s/overlays"
+        required: false
+        type: string
+      switched_services:
+        description: "A4: umschaltbare Services (leerraumgetrennt)"
+        default: ""
+        required: false
+        type: string
+      active_variant:
+        description: "A4: Umgebung -> aktive Variante als JSON, z.B. {\"production\":\"pg17\"}"
+        default: ""
+        required: false
+        type: string
+      service_selector_key:
+        description: "A4: Label-Key, über den ein Service selektiert (Default app.kubernetes.io/instance)"
+        default: ""
+        required: false
+        type: string
+      version_exempt:
+        description: "A2: Workloads ohne -pgXX-Suffix, die erlaubt sind (leerraumgetrennt)"
+        default: ""
+        required: false
+        type: string
+      forbidden_bare_resources:
+        description: "A3: nie erlaubte nackte Ressourcen als JSON, z.B. [[\"Deployment\",\"orders\"]]"
+        default: ""
+        required: false
+        type: string
+      placeholder_tokens:
+        description: "A1: verbotene Platzhalter (leerraumgetrennt); leer = Default-Tokens"
+        default: ""
+        required: false
+        type: string
+      alert_min:
+        description: "A8: Umgebung -> Mindestzahl Alerts als JSON, z.B. {\"production\":1}"
+        default: ""
+        required: false
+        type: string
+      require_readiness_probes:
+        description: "A7: readinessProbe je Deployment-Container erzwingen"
+        default: true
+        required: false
+        type: boolean
+      require_explicit_replicas:
+        description: "A6: explizite spec.replicas je Deployment erzwingen"
+        default: true
+        required: false
+        type: boolean
+      require_variant_versioning:
+        description: "A2: -pgXX-Versionierung erzwingen (nur für Multi-DB-Variantenprojekte)"
+        default: false
+        required: false
+        type: boolean
+      uv-version:
+        description: "Version von uv"
+        default: "0.11.31"
+        required: false
+        type: string
+      zeit_k8stesting_version:
+        description: "Versions-Constraint für das zeit.k8stesting-Paket"
+        default: ">=0.1.0"
+        required: false
+        type: string
+jobs:
+  pytest:
+    name: Run generic k8s policy tests
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Guard against an existing k8s/tests
+        run: |
+          if [ -e k8s/tests ]; then
+            echo "::error::k8s/tests exists in this repo. This workflow generates an" \
+                 "ephemeral suite and is meant for projects WITHOUT their own tests." \
+                 "Use k8s-tests.yaml instead."
+            exit 1
+          fi
+
+      - name: Authenticate to Google Cloud
+        id: baseproject
+        uses: ZeitOnline/gh-action-baseproject@v0
+        with:
+          project_name: ${{ inputs.project }}
+          environment: ${{ inputs.environment }}
+          google_auth: true
+
+      - name: Generate ephemeral test suite
+        # printf (statt heredoc), damit die YAML-Einrückung nicht in die Dateien leakt
+        # (fatal für die import-Zeile in test_k8s.py).
+        run: |
+          mkdir -p k8s/tests
+          printf '%s\n' \
+            '[project]' \
+            'name = "k8s-policy-tests"' \
+            'version = "0.0.0"' \
+            'requires-python = ">=3.14"' \
+            "dependencies = [\"zeit.k8stesting${{ inputs.zeit_k8stesting_version }}\"]" \
+            '' \
+            '[[tool.uv.index]]' \
+            'name = "pypi-zon"' \
+            'url = "https://europe-west3-python.pkg.dev/zeitonline-engineering/pypi-zon/simple/"' \
+            'default = true' \
+            > k8s/tests/pyproject.toml
+          printf '%s\n' 'from zeit.k8stesting.testsuite import *  # noqa: F401,F403' \
+            > k8s/tests/test_k8s.py
+          echo "--- generated k8s/tests/pyproject.toml ---"; cat k8s/tests/pyproject.toml
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          version: ${{ inputs.uv-version }}
+
+      - uses: imranismail/setup-kustomize@53f941b41dca13ed61874bbc6b4b6e1562877530 # v3
+
+      - name: Run pytest
+        working-directory: k8s/tests
+        env:
+          # uv-Auth für den pypi-zon-Mirror (zeit.k8stesting + alle Deps)
+          UV_INDEX_PYPI_ZON_USERNAME: oauth2accesstoken
+          UV_INDEX_PYPI_ZON_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
+          # Policy aus den Inputs -> K8sPolicy.from_env()
+          ZEIT_K8STESTING_KUSTOMIZE_ROOT: ${{ github.workspace }}/${{ inputs.overlays_dir }}
+          ZEIT_K8STESTING_ENVIRONMENTS: ${{ inputs.environments }}
+          ZEIT_K8STESTING_SWITCHED_SERVICES: ${{ inputs.switched_services }}
+          ZEIT_K8STESTING_ACTIVE_VARIANT: ${{ inputs.active_variant }}
+          ZEIT_K8STESTING_SERVICE_SELECTOR_KEY: ${{ inputs.service_selector_key }}
+          ZEIT_K8STESTING_VERSION_EXEMPT: ${{ inputs.version_exempt }}
+          ZEIT_K8STESTING_FORBIDDEN_BARE_RESOURCES: ${{ inputs.forbidden_bare_resources }}
+          ZEIT_K8STESTING_PLACEHOLDER_TOKENS: ${{ inputs.placeholder_tokens }}
+          ZEIT_K8STESTING_ALERT_MIN: ${{ inputs.alert_min }}
+          ZEIT_K8STESTING_REQUIRE_READINESS_PROBES: ${{ inputs.require_readiness_probes }}
+          ZEIT_K8STESTING_REQUIRE_EXPLICIT_REPLICAS: ${{ inputs.require_explicit_replicas }}
+          ZEIT_K8STESTING_REQUIRE_VARIANT_VERSIONING: ${{ inputs.require_variant_versioning }}
+        run: uv run --link-mode=copy pytest

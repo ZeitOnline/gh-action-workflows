@@ -84,6 +84,7 @@ jobs:
 - [**pre-commit**](#pre-commit) — Run code checks via [pre-commit](https://pre-commit.com/)
 - [**k8s-validation**](#k8s-validation) — Validate Kubernetes manifests using [kubeval](https://www.kubeval.com/)
 - [**k8s-tests**](#k8s-tests) — Run the `pytest`-based assertions over the generated Kubernetes manifests
+- [**k8s-policy-tests**](#k8s-policy-tests) — Run the generic `zeit.k8stesting` policy suite without any project-side test files
 - [**nightwatch-build**](#nightwatch-build) — Build, push and run Nightwatch smoke test images
 - [**release-notification**](#release-notification) — Notify Slack and Prometheus about deployments
 
@@ -216,6 +217,55 @@ jobs:
     uses: zeitonline/gh-action-workflows/.github/workflows/k8s-tests.yaml
     with:
       project: premium-services
+```
+
+---
+
+### k8s-policy-tests
+
+Runs the **generic** [`zeit.k8stesting`](https://github.com/ZeitOnline/zeit.k8stesting) policy
+suite against a project's rendered manifests **without any project-side test files**. The job
+materialises an ephemeral `k8s/tests/` from the inputs below and runs it — ideal for the many
+simple projects that only need the shared policy (A1–A8) and no custom `kustomize_jq` tests.
+Projects that *do* need custom assertions keep their own suite and use [k8s-tests](#k8s-tests)
+instead (this workflow fails fast if a `k8s/tests/` already exists).
+
+The inputs mirror `zeit.k8stesting`'s `K8sPolicy`. Default posture: universal checks on,
+variant-versioning off — placeholder-leaks (A1), explicit replicas (A6) and readiness probes
+(A7) run; the `-pgXX` variant-versioning check (A2) is off by default; A3/A4/A5/A8 are opt-in
+(enabled by providing their inputs).
+
+#### Inputs
+
+| Name | Required | Default | Description |
+|------|----------|---------|-------------|
+| `project` | **yes** | — | GCP/baseproject identity of the calling repo (authenticates to GCP and exposes the private `pypi-zon` credentials to `uv`) |
+| `environment` | no | `production` | baseproject environment |
+| `environments` | no | `devel staging production` | Space-separated kustomize environments to parametrize over |
+| `overlays_dir` | no | `k8s/overlays` | Directory holding one sub-directory per environment |
+| `switched_services` | no | — | A4: space-separated services whose selector must point at the active variant |
+| `active_variant` | no | — | A4: JSON map environment → active variant, e.g. `{"production":"pg17"}` |
+| `service_selector_key` | no | `app.kubernetes.io/instance` | A4: label key a Service selects on |
+| `version_exempt` | no | — | A2: space-separated workloads allowed to carry no `-pgXX` suffix |
+| `forbidden_bare_resources` | no | — | A3: JSON list of `["Kind","name"]` that must never appear un-versioned |
+| `placeholder_tokens` | no | *(built-in set)* | A1: space-separated forbidden placeholder tokens |
+| `alert_min` | no | — | A8: JSON map environment → minimum `Alert` count, e.g. `{"production":1}` |
+| `require_readiness_probes` | no | `true` | A7 on/off |
+| `require_explicit_replicas` | no | `true` | A6 on/off |
+| `require_variant_versioning` | no | `false` | A2 on/off (enable for multi-DB variant projects) |
+| `uv-version` | no | `0.11.31` | Version of `uv` to install |
+| `zeit_k8stesting_version` | no | `>=0.1.0` | Version constraint for the `zeit.k8stesting` package |
+
+#### Example
+
+``` yaml
+jobs:
+  k8s-policy:
+    uses: zeitonline/gh-action-workflows/.github/workflows/k8s-policy-tests.yaml
+    secrets: inherit
+    with:
+      project: my-service
+      environments: "staging production"
 ```
 
 ---
