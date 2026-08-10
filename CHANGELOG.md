@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.2.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.1.0...4.2.0) (2026-08-10)
+
+
+### Features
+
+* **k8s-tests:** add reusable workflow to run k8s manifest tests ([#133](https://github.com/ZeitOnline/gh-action-workflows/issues/133)) ([fc1479b](https://github.com/ZeitOnline/gh-action-workflows/commit/fc1479b477930494c195c1a1bc5f583ac2bfada4))
+
+
+### Bug Fixes
+
+* **k8s-policy-tests:** deterministic kustomize root via generated conftest ([#136](https://github.com/ZeitOnline/gh-action-workflows/issues/136)) ([a222609](https://github.com/ZeitOnline/gh-action-workflows/commit/a2226096679a6528b631b12f0dfa65c8e5c4c1fa))
+
 ## [4.1.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.0.0...4.1.0) (2026-06-24)
 
 
