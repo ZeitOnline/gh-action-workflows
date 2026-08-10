@@ -131,7 +131,28 @@ jobs:
             > k8s/tests/pyproject.toml
           printf '%s\n' 'from zeit.k8stesting.testsuite import *  # noqa: F401,F403' \
             > k8s/tests/test_k8s.py
+          # conftest.py: kustomize_root_directory + kustomize_environment_names auf
+          # conftest-Ebene überschreiben -- das gewinnt DETERMINISTISCH gegen pytest-kustomize
+          # (Plugin-gegen-Plugin-Fixture-Reihenfolge ist nicht garantiert). Der Root wird aus
+          # der env-getriebenen Plugin-Fixture wiederverwendet.
+          printf '%s\n' \
+            'import os' \
+            '' \
+            'import pytest' \
+            '' \
+            'from zeit.k8stesting.plugin import kustomize_root_directory  # noqa: F401' \
+            '' \
+            '' \
+            '@pytest.fixture(scope="session")' \
+            'def kustomize_environment_names():' \
+            '    return os.environ.get("ZEIT_K8STESTING_ENVIRONMENTS", "").split() or [' \
+            '        "devel",' \
+            '        "staging",' \
+            '        "production",' \
+            '    ]' \
+            > k8s/tests/conftest.py
           echo "--- generated k8s/tests/pyproject.toml ---"; cat k8s/tests/pyproject.toml
+          echo "--- generated k8s/tests/conftest.py ---"; cat k8s/tests/conftest.py
 
       - name: Install uv
         uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
