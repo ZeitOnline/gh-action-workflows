@@ -34,7 +34,7 @@ jobs:
           echo "project=$project" >> "$GITHUB_ENV"
           echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
       - name: Setup auth
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@b86f75e115ac9546a653b58d3406c268ae3fb83b # v0
         with:
           project_name: ${{ env.project }}
           environment: production     # needs 'production' service account

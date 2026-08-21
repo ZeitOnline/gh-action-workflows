@@ -106,7 +106,7 @@ jobs:
 
       - name: Authenticate to Google Cloud
         id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@b86f75e115ac9546a653b58d3406c268ae3fb83b # v0
         with:
           project_name: ${{ inputs.project }}
           environment: ${{ inputs.environment }}

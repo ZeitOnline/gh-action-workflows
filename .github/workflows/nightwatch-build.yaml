@@ -87,7 +87,7 @@ jobs:
           echo "image=$( kustomize build ${{inputs.k8s_base}}/${{ inputs.environment }} | awk -F: '/image: .*nightwatch/ { print $2 }' | tr -d ' ' | uniq )" >> "$GITHUB_ENV"
           echo "tag=${{ steps.tag.outputs.tag }}" >> "$GITHUB_ENV"
       - name: Setup auth
-        uses: ZeitOnline/gh-action-baseproject@v0
+        uses: ZeitOnline/gh-action-baseproject@b86f75e115ac9546a653b58d3406c268ae3fb83b # v0
         id: baseproject
         with:
           project_name: ${{ env.project }}
