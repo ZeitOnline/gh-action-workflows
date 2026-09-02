@@ -9,6 +9,13 @@ on:
         description: "Optional command to set up tools, plugins etc"
         type: string
         default: "uv sync --frozen --only-group lint"
+      baseproject-name:
+        description: "Optional project name to pass to gh-action-baseproject"
+        type: string
+      baseproject-environment:
+        description: "Optional environment to pass to gh-action-baseproject"
+        type: string
+        default: "devel"
 jobs:
   linter:
     name: Lefthook
@@ -25,6 +32,13 @@ jobs:
         if: inputs.node-version
         with:
           node-version: ${{inputs.node-version}}
+      - name: baseproject
+        uses: ZeitOnline/gh-action-baseproject@v0
+        if: inputs.baseproject-name
+        with:
+          project_name: ${{inputs.baseproject-name}}
+          environment: ${{inputs.baseproject-environment}}
+          google_auth: true # for pypi-zon download
       - name: Run setup command
         run: ${{ inputs.setup-command }}
       - name: Run code checks
