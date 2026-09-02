@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.3.0...4.3.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* **lefthook:** declare permissions a) at all b) with id-token needed for baseproject ([#145](https://github.com/ZeitOnline/gh-action-workflows/issues/145)) ([9ba3b66](https://github.com/ZeitOnline/gh-action-workflows/commit/9ba3b6600369df9d5b0e2915a7de2224ad7fc72d))
+
 ## [4.3.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.2.0...4.3.0) (2026-09-02)
 
 
