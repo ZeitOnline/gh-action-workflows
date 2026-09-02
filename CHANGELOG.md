@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.2.0...4.3.0) (2026-09-02)
+
+
+### Features
+
+* **lefthook:** optionally set up baseproject for GAR pypi-zon access ([#143](https://github.com/ZeitOnline/gh-action-workflows/issues/143)) ([0b02a55](https://github.com/ZeitOnline/gh-action-workflows/commit/0b02a553f859801fad3568a631dcc820f1892fda))
+
 ## [4.2.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.1.0...4.2.0) (2026-08-10)
 
 
