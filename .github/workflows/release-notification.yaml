@@ -34,6 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
+        if: inputs.emoji
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set variables
@@ -47,6 +48,7 @@ jobs:
 
       - name: Baseproject
         id: baseproject
+        if: inputs.emoji
         uses: ZeitOnline/gh-action-baseproject@v0
         with:
             project_name: ${{ env.project }}
@@ -54,6 +56,7 @@ jobs:
 
       - name: Retrieve secrets from Vault
         id: vault-secrets
+        if: inputs.emoji
         uses: hashicorp/vault-action@892a26828f195e65540a40b4768ae4571f51ebfc # v4
         with:
             method: jwt
@@ -64,6 +67,7 @@ jobs:
                 zon/v1/slack/hackbot HOOK_TOKEN;
 
       - name: Post release in slack channel
+        if: inputs.emoji
         uses: fjogeleit/http-request-action@f98bb26551cd1af7d3eb2674578a80754ece88db # v2.0.1
         with:
             url: "https://hackbot.zon.zeit.de/${{ steps.vault-secrets.outputs.HOOK_TOKEN }}/deployment/releases"
