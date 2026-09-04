@@ -92,7 +92,7 @@ jobs:
 
 ### build-test-push
 
-Runs tests inside Docker Compose, publishes test results, then builds and pushes multi-target Docker images to Google Artifact Registry. When a `versions` directory is provided, it also updates the Kustomize image tags and commits them back — intended for automatic staging deployments.
+Runs tests inside Docker Compose, publishes test results, then builds each target, scans it with the Sysdig CLI scanner (policy `sysdig-best-practices`) and pushes the resulting multi-target Docker images to Google Artifact Registry. When a `versions` directory is provided, it also updates the Kustomize image tags and commits them back — intended for automatic staging deployments.
 
 #### Inputs
 
@@ -155,14 +155,17 @@ Validates commit messages against [conventional commit](https://www.conventional
 
 ### lefthook
 
-Runs code quality checks using [Lefthook](https://github.com/evilmartians/lefthook) (as a replacement for the [pre-commit](#pre-commit) workflow below). Sets up `uv` and optionally Node.js, then executes `lefthook run pre-commit --all-files`.
+Runs code quality checks using [Lefthook](https://github.com/evilmartians/lefthook) (as a replacement for the [pre-commit](#pre-commit) workflow below). Sets up `uv` and optionally Python and/or Node.js, then executes `lefthook run pre-commit --all-files`.
 
 #### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
+| `python-version` | no | — | Python version to install (if needed). The special value `docker` extracts the version from the `FROM python:…` line of the `Dockerfile` |
 | `node-version` | no | — | Node.js version to install (if needed) |
 | `setup-command` | no | `uv sync --frozen --only-group lint` | Command to install linting tools |
+| `baseproject-name` | no | — | Project name passed to `gh-action-baseproject`. When set, authenticates to Google Cloud so linting tools can be installed from the private `pypi-zon` index |
+| `baseproject-environment` | no | `devel` | Environment passed to `gh-action-baseproject` |
 
 ---
 
@@ -272,7 +275,7 @@ jobs:
 
 ### nightwatch-build
 
-Builds a Docker image containing per project "smoke" or "nightwatch" tests, pushes it to GAR, runs a security scan (on PRs), and executes the tests in a Kubernetes pod. On `main`, it updates the image tag in Kustomize and commits it back.
+Builds a Docker image containing per project "smoke" or "nightwatch" tests, pushes it to GAR, runs a security scan (on PRs), and executes the tests in a Kubernetes pod created via `kustomize`. On `main`, it updates the image tag in Kustomize and commits it back.
 
 #### Inputs
 
@@ -280,9 +283,9 @@ Builds a Docker image containing per project "smoke" or "nightwatch" tests, push
 |------|----------|---------|-------------|
 | `project` | no | repo name | GCP project name |
 | `environment` | no | `staging` | Target environment |
-| `gke_cluster` | no | — | GKE cluster name (defaults to environment name) |
-| `args` | no | *(JSON overrides)* | `kubectl run` overrides for pod configuration |
-| `versions` | no | — | Kustomize directory for updating image tags |
+| `gke_cluster` | no | `main-staging-25-01` | GKE cluster name (falls back to the environment name when set to an empty string) |
+| `kustomization` | no | `k8s/base/nightwatch/test` | Directory containing the Kustomization for the test pod |
+| `versions` | no | `k8s/base/nightwatch/versions` | Kustomize directory for updating image tags |
 | `k8s_base` | no | `k8s` | Directory containing the Kustomize base with the image name |
 
 #### Outputs
@@ -295,7 +298,7 @@ Builds a Docker image containing per project "smoke" or "nightwatch" tests, push
 
 ### release-notification
 
-Posts a deployment notification to Slack (via Hackbot) and pushes a deployment timestamp metric to Prometheus (via pushgateway).
+Posts a deployment notification to Slack (via Hackbot) and pushes a deployment timestamp metric to Prometheus (via pushgateway). Both halves are optional: setting `emoji` to an empty string skips the Slack notification, setting `prometheus_job` to an empty string skips the metric.
 
 #### Inputs
 
@@ -305,5 +308,5 @@ Posts a deployment notification to Slack (via Hackbot) and pushes a deployment t
 | `version` | **yes** | — | Deployed version |
 | `project` | no | repo name | Project name |
 | `changelog` | no | `CHANGELOG.md` | Path to changelog file |
-| `emoji` | no | `loudspeaker` | Slack emoji for the notification |
+| `emoji` | no | `loudspeaker` | Slack emoji for the notification (set empty to skip the Slack notification) |
 | `prometheus_job` | no | `gha-deployments` | Prometheus job name (set empty to skip) |
