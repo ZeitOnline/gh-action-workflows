@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.3.1...4.4.0) (2026-09-04)
+
+
+### Features
+
+* **lefthook:** optionally pin python version ([#153](https://github.com/ZeitOnline/gh-action-workflows/issues/153)) ([a81b952](https://github.com/ZeitOnline/gh-action-workflows/commit/a81b952f25ae530e4d31584defdd5575ce7f6ee1))
+
 ## [4.3.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.3.0...4.3.1) (2026-09-02)
 
 
