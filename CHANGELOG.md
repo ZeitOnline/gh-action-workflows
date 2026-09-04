@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.4.0...4.5.0) (2026-09-04)
+
+
+### Features
+
+* make slack notifications optional ([#152](https://github.com/ZeitOnline/gh-action-workflows/issues/152)) ([191ab46](https://github.com/ZeitOnline/gh-action-workflows/commit/191ab4635501b6a3a2340e83281942bf8c46e89e))
+
 ## [4.4.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.3.1...4.4.0) (2026-09-04)
 
 
