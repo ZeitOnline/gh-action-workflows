@@ -2,6 +2,9 @@ name: Check code issues
 on:
   workflow_call:
     inputs:
+      python-version:
+        description: "Optionally install Python with the given version. Special value `docker` extracts version from Dockerfile."
+        type: string
       node-version:
         description: "Optionally install Node.js with the given version"
         type: string
@@ -26,6 +29,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Parse input
+        run: |
+          if [[ "${{inputs.python-version}}" == "docker" ]]; then
+              python_version=$(sed -ne '/FROM python:/s+^FROM python:\([^-]*\).*$+\1+p' Dockerfile)
+              echo "python_version=$python_version" >> $GITHUB_ENV
+          else
+              echo "python_version=${{inputs.python-version}}" >> $GITHUB_ENV
+          fi
+      - name: Install Python
+        if: env.python_version
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{env.python_version}}
       - name: Install Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         if: inputs.node-version
