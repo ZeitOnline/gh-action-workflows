@@ -33,6 +33,28 @@ jobs:
           project="${input:-$default}"
           echo "project=$project" >> "$GITHUB_ENV"
           echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
+      # make sure the images contain all changes up to the release commit
+      - name: Check image versions
+        run: |
+          versions="${{ inputs.versions }}"
+          newest="" distance=""
+          for tag in $(awk '/newTag:/ { print $2 }' "$versions" | sort -u); do
+            sha=$(git rev-parse -q --verify "$tag^{commit}") || continue
+            count=$(git rev-list --count "$sha..HEAD")
+            if [ -z "$newest" ] || [ "$count" -lt "$distance" ]; then
+              newest="$sha" distance="$count"
+            fi
+          done
+          if [ -z "$newest" ]; then
+            echo "::error::None of the image tags in '$versions' matches a commit."
+            exit 1
+          fi
+          changes=$(git diff --name-only "$newest" HEAD^ -- . ":(exclude)$(dirname "$versions")")
+          if [ -n "$changes" ]; then
+            echo "::error::Images were built from $(git rev-parse --short "$newest") and lack later changes (was the release merged before the 'staging' build finished?), please create a new release."
+            echo "$changes"
+            exit 1
+          fi
       - name: Setup auth
         uses: ZeitOnline/gh-action-baseproject@v0
         with:

@@ -114,6 +114,8 @@ Runs tests inside Docker Compose, publishes test results, then builds each targe
 
 Adds an additional tag (typically the release version) to images that already exist in Google Artifact Registry. This enables production deployments by re-using the exact same images that were previously built and tested for staging — without rebuilding them.
 
+Before tagging, it checks that the images were built from the commit preceding the release (apart from changes to the `versions` directory itself). Otherwise, e.g. when the release pull request was merged before the 'staging' build had finished, the workflow fails instead of promoting outdated images.
+
 #### Inputs
 
 | Name | Required | Default | Description |
