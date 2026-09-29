@@ -57,6 +57,8 @@ jobs:
       - name: Make uv-installed commands available directly on PATH
         run: echo $PWD/.venv/bin >> $GITHUB_PATH
       - name: Run setup command
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv
         run: ${{ inputs.setup-command }}
       - name: Run code checks
         run: lefthook run pre-commit --all-files
