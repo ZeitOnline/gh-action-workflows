@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.5.0...4.5.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **lefthook:** install `setup-command` tools into the root venv ([#158](https://github.com/ZeitOnline/gh-action-workflows/issues/158)) ([e50cbe1](https://github.com/ZeitOnline/gh-action-workflows/commit/e50cbe1c4ad3cccbbb18e0bd8f3dc53b3129056e))
+
 ## [4.5.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.4.0...4.5.0) (2026-09-04)
 
 
