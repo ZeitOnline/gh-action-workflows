@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.6.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.5.1...4.6.0) (2026-10-07)
+
+
+### Features
+
+* **add-tag:** refuse to promote images lacking recent changes ([#160](https://github.com/ZeitOnline/gh-action-workflows/issues/160)) ([9c064df](https://github.com/ZeitOnline/gh-action-workflows/commit/9c064df6f4aa8e637d0b855630f47ddce5551fc3))
+* **nightwatch-build:** make docker build context configurable ([#163](https://github.com/ZeitOnline/gh-action-workflows/issues/163)) ([d8c03e7](https://github.com/ZeitOnline/gh-action-workflows/commit/d8c03e74de2fad359a62d554382fd3d258f040dc))
+
 ## [4.5.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.5.0...4.5.1) (2026-10-02)
 
 
