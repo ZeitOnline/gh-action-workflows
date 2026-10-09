@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.6.0...4.7.0) (2026-10-09)
+
+
+### Features
+
+* **nightwatch:** push the image version with a broker token ([#166](https://github.com/ZeitOnline/gh-action-workflows/issues/166)) ([e730b4c](https://github.com/ZeitOnline/gh-action-workflows/commit/e730b4c82d0e6050522be8282a3d76548b7f42b6))
+
 ## [4.6.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.5.1...4.6.0) (2026-10-07)
 
 
