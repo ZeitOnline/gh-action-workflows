@@ -74,10 +74,20 @@ jobs:
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
+      # The versions push below has to start the caller's deploy workflows,
+      # which a push with the job token does not; only main runs push.
+      - name: Token for the versions push (nightwatch-versions)
+        id: sts
+        if: ${{ inputs.versions && github.ref_name == 'main' }}
+        uses: octo-sts/action@f603d3be9d8dd9871a265776e625a27b00effe05 # v1.1.1
+        with:
+          domain: ${{ vars.OCTO_STS_DOMAIN }}
+          scope: ${{ github.repository_owner }}
+          identity: nightwatch-versions
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          token: ${{ secrets.PRIVATE_REPO_ACCESS_PAT }}
+          token: ${{ steps.sts.outputs.token || github.token }}
       - name: Set tag
         id: tag
         run: date +tag=%Y%m%d%H%M%S >> "$GITHUB_OUTPUT"
