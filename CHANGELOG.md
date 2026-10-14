@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.7.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.7.0...4.7.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* commit the image tags through the GitHub API ([#170](https://github.com/ZeitOnline/gh-action-workflows/issues/170)) ([144486a](https://github.com/ZeitOnline/gh-action-workflows/commit/144486a334f15f5773a12982a724fa210d8ba454))
+* refresh the checkout before the API commit ([#171](https://github.com/ZeitOnline/gh-action-workflows/issues/171)) ([8ff4d4c](https://github.com/ZeitOnline/gh-action-workflows/commit/8ff4d4ce2314e02aba058c71a8f0146907b9f690))
+
 ## [4.7.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.6.0...4.7.0) (2026-10-09)
 
 
