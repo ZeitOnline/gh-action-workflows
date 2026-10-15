@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.3](https://github.com/ZeitOnline/gh-action-workflows/compare/4.7.2...4.7.3) (2026-10-15)
+
+
+### Bug Fixes
+
+* **build-test-push:** no literal backticks in the versions commit message ([#176](https://github.com/ZeitOnline/gh-action-workflows/issues/176)) ([3ca3fa0](https://github.com/ZeitOnline/gh-action-workflows/commit/3ca3fa0b79359580a8954a1a7b9420b264dc794c))
+
 ## [4.7.2](https://github.com/ZeitOnline/gh-action-workflows/compare/4.7.1...4.7.2) (2026-10-14)
 
 
