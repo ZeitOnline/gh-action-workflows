@@ -142,7 +142,7 @@ jobs:
         if: ${{ inputs.versions }}
         uses: planetscale/ghcommit-action@a6b150b81dca5dd027baa898604418eec9e11465 # v0.2.22
         with:
-          commit_message: "ci: update image versions (``${{ inputs.versions }}``)"
+          commit_message: "ci: update image versions (${{ inputs.versions }})"
           repo: ${{ github.repository }}
           branch: ${{ github.ref_name }}
           file_pattern: ${{ inputs.versions }}/kustomization.yaml
