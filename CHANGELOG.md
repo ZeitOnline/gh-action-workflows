@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.7.3...4.8.0) (2026-10-29)
+
+
+### Features
+
+* add pypi-release workflow for open source Python packages ([#180](https://github.com/ZeitOnline/gh-action-workflows/issues/180)) ([2c5771b](https://github.com/ZeitOnline/gh-action-workflows/commit/2c5771bf2b6b7c04c85371ddd00eb987a2e5a215))
+
 ## [4.7.3](https://github.com/ZeitOnline/gh-action-workflows/compare/4.7.2...4.7.3) (2026-10-15)
 
 
