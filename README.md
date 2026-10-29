@@ -173,9 +173,6 @@ jobs:
       slack-channel: C06JB4PMALW  # team-content-alerts
 ```
 
-------|----------|---------|-------------|
-| `slack-channel` | no | — | Slack channel id to alert when the release fails (needs `secrets: inherit` for `SLACK_BOT_TOKEN`) |
-
 #### Example
 
 ``` yaml title=".github/workflows/release.yaml"
