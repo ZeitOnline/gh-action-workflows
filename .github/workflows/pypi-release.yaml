@@ -1,7 +1,14 @@
-name: Release to PyPI
+name: Release Python package
 on:
   workflow_call:
     inputs:
+      registry:
+        description: "'pypi' for the public PyPI, 'internal' for our registry in Google Artifact Registry"
+        type: string
+        default: pypi
+      project:
+        description: "Baseproject whose service account may publish to the internal registry (only with registry 'internal')"
+        type: string
       slack-channel:
         description: "Optional Slack channel id to alert when the release fails"
         type: string
@@ -20,11 +27,17 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      # Fail before Release Please tags a release that could not be published
+      - name: Check inputs
+        if: inputs.registry != 'pypi' && (inputs.registry != 'internal' || inputs.project == '')
+        run: |
+          echo "::error::registry has to be 'pypi', or 'internal' together with project"
+          exit 1
       - name: Release please
         id: release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
   publish:
-    name: Publish to PyPI
+    name: Publish
     needs: release-please
     if: needs.release-please.outputs.release_created
     runs-on: zon-ubuntu-general-dind
@@ -40,17 +53,24 @@ jobs:
           fetch-depth: 0
       - name: Install uv
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
-      - name: Build
-        run: uv build
       # 'pypi-oss' grants the repositories listed in its terraform project
-      # read access to the PyPI token in Vault
+      # read access to the PyPI token in Vault. The internal registry is written
+      # with the access token of the given project's service account instead.
       - name: Baseproject
         id: baseproject
         uses: ZeitOnline/gh-action-baseproject@v0
         with:
-          project_name: pypi-oss
+          project_name: ${{ inputs.registry == 'internal' && inputs.project || 'pypi-oss' }}
           environment: production
+          google_auth: ${{ inputs.registry == 'internal' }}
+      # Internal packages may resolve their build dependencies from the 'pypi-zon' index
+      - name: Build
+        run: uv build
+        env:
+          UV_INDEX_PYPI_ZON_USERNAME: oauth2accesstoken
+          UV_INDEX_PYPI_ZON_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
       - name: Retrieve PyPI token from Vault
+        if: inputs.registry == 'pypi'
         uses: hashicorp/vault-action@892a26828f195e65540a40b4768ae4571f51ebfc # v4
         with:
           method: jwt
@@ -59,8 +79,16 @@ jobs:
           role: ${{ steps.baseproject.outputs.gha_vault_role }}
           secrets: |
             zon/v1/pypi/zon-backend token | UV_PUBLISH_TOKEN;
-      - name: Publish
+      - name: Publish to PyPI
+        if: inputs.registry == 'pypi'
         run: uv publish
+      - name: Publish to internal registry
+        if: inputs.registry == 'internal'
+        run: uv publish
+        env:
+          UV_PUBLISH_URL: https://${{ vars.GAR_PYPI_REGISTRY_INTERNAL }}/
+          UV_PUBLISH_USERNAME: oauth2accesstoken
+          UV_PUBLISH_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
   alert:
     name: Alert Slack
     needs: [release-please, publish]
