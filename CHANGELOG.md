@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.8.0...4.9.0) (2026-10-29)
+
+
+### Features
+
+* **pypi-release:** publish to the internal registry ([#182](https://github.com/ZeitOnline/gh-action-workflows/issues/182)) ([4b25eef](https://github.com/ZeitOnline/gh-action-workflows/commit/4b25eefd2f452bfe6aa3c469bc98363f7aac0556))
+
 ## [4.8.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.7.3...4.8.0) (2026-10-29)
 
 
