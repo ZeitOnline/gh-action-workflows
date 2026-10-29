@@ -79,7 +79,7 @@ jobs:
 - [**build-test-push**](#build-test-push) — Build, test and push Docker images for staging deployments
 - [**add-tag**](#add-tag) — Re-tag existing images in the registry for production deployments
 - [**release-please**](#release-please) — Manage releases via [Release Please](https://github.com/googleapis/release-please)
-- [**pypi-release**](#pypi-release) — Release open source Python packages to PyPI via Release Please
+- [**pypi-release**](#pypi-release) — Release Python packages to PyPI or the internal registry via Release Please
 - [**commit-lint**](#commit-lint) — Lint commit messages using [commitlint](https://commitlint.js.org/)
 - [**lefthook**](#lefthook) — Run pre-commit code checks via [Lefthook](https://github.com/evilmartians/lefthook)
 - [**pre-commit**](#pre-commit) — Run code checks via [pre-commit](https://pre-commit.com/)
@@ -142,14 +142,16 @@ Runs [Release Please](https://github.com/googleapis/release-please) to manage ve
 
 ### pypi-release
 
-Releases an open source Python package to [PyPI](https://pypi.org). [Release Please](https://github.com/googleapis/release-please) keeps a release pull request with the changelog up to date from conventional commits; merging it tags the release, and the package is then built from that tag and published. The package version has to come from the git tag (e.g. `hatch-vcs`), the repository needs a `release-please-config.json` and `.release-please-manifest.json`.
+Releases a Python package to [PyPI](https://pypi.org) or to our internal registry in Google Artifact Registry. [Release Please](https://github.com/googleapis/release-please) keeps a release pull request with the changelog up to date from conventional commits; merging it tags the release, and the package is then built from that tag and published. The package version has to come from the git tag (e.g. `hatch-vcs`), the repository needs a `release-please-config.json` and `.release-please-manifest.json`.
 
-The PyPI token is read from Vault via the `pypi-oss` baseproject, so the repository has to be listed in its [project metadata](https://github.com/ZeitOnline/terraform-projects/blob/main/projects/projects-team-engineering/pypi-oss/project-metadata.json).
+For PyPI, the token is read from Vault via the `pypi-oss` baseproject, so the repository has to be listed in its [project metadata](https://github.com/ZeitOnline/terraform-projects/blob/main/projects/projects-team-engineering/pypi-oss/project-metadata.json). For the internal registry, the CI service account of `project` publishes to `vars.GAR_PYPI_REGISTRY_INTERNAL`, so it needs write access to that repository; its token also authenticates the `pypi-zon` index during the build.
 
 #### Inputs
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
+| `registry` | no | `pypi` | `pypi` for the public PyPI, `internal` for the internal registry |
+| `project` | with `registry: internal` | — | Baseproject whose service account publishes to the internal registry |
 | `slack-channel` | no | — | Slack channel id to alert when the release fails (needs `secrets: inherit` for `SLACK_BOT_TOKEN`) |
 
 #### Example
@@ -173,21 +175,12 @@ jobs:
       slack-channel: C06JB4PMALW  # team-content-alerts
 ```
 
-#### Example
+An internal package passes the registry and its baseproject:
 
-``` yaml title=".github/workflows/release.yaml"
-name: Release
-on:
-  workflow_dispatch:
-jobs:
-  release:
-    uses: zeitonline/gh-action-workflows/.github/workflows/pypi-release.yaml
-    permissions:
-      contents: write
-      id-token: write
-    secrets: inherit
+``` yaml
     with:
-      slack-channel: C06JB4PMALW  # team-content-alerts
+      registry: internal
+      project: zeit-k8stesting
 ```
 
 ---
