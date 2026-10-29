@@ -1,0 +1,78 @@
+name: Release to PyPI
+on:
+  workflow_call:
+    inputs:
+      slack-channel:
+        description: "Optional Slack channel id to alert when the release fails"
+        type: string
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: false
+jobs:
+  release-please:
+    name: Release please
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Release please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+  publish:
+    name: Publish to PyPI
+    needs: release-please
+    if: needs.release-please.outputs.release_created
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # The version is derived from the release tag (hatch-vcs), which needs the history
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+          fetch-depth: 0
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+      - name: Build
+        run: uv build
+      # 'pypi-oss' grants the repositories listed in its terraform project
+      # read access to the PyPI token in Vault
+      - name: Baseproject
+        id: baseproject
+        uses: ZeitOnline/gh-action-baseproject@v0
+        with:
+          project_name: pypi-oss
+          environment: production
+      - name: Retrieve PyPI token from Vault
+        uses: hashicorp/vault-action@892a26828f195e65540a40b4768ae4571f51ebfc # v4
+        with:
+          method: jwt
+          url: ${{ steps.baseproject.outputs.vault_addr }}
+          path: ${{ steps.baseproject.outputs.gha_vault_path }}
+          role: ${{ steps.baseproject.outputs.gha_vault_role }}
+          secrets: |
+            zon/v1/pypi/zon-backend token | UV_PUBLISH_TOKEN;
+      - name: Publish
+        run: uv publish
+  alert:
+    name: Alert Slack
+    needs: [release-please, publish]
+    if: failure() && inputs.slack-channel
+    runs-on: zon-ubuntu-general-dind
+    permissions: {}
+    steps:
+      - name: Alert Slack
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ inputs.slack-channel }}"
+            text: ":red_circle: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.repository }}> release failed"
