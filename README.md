@@ -88,6 +88,7 @@ jobs:
 - [**k8s-policy-tests**](#k8s-policy-tests) — Run the generic `zeit.k8stesting` policy suite without any project-side test files
 - [**nightwatch-build**](#nightwatch-build) — Build, push and run Nightwatch smoke test images
 - [**release-notification**](#release-notification) — Notify Slack and Prometheus about deployments
+- [**release-freeze**](#release-freeze) — Block merging while a pull request carries a `freeze` label
 
 ---
 
@@ -358,3 +359,33 @@ Posts a deployment notification to Slack (via Hackbot) and pushes a deployment t
 | `changelog` | no | `CHANGELOG.md` | Path to changelog file |
 | `emoji` | no | `loudspeaker` | Slack emoji for the notification (set empty to skip the Slack notification) |
 | `prometheus_job` | no | `gha-deployments` | Prometheus job name (set empty to skip) |
+
+---
+
+### release-freeze
+
+Sets a `release-freeze` commit status on every open pull request: *failure* while any open pull request carries the `label` (typically the release-please one), *success* otherwise. Release-please's own pull request is always exempt. Make `release-freeze` a required status check (ruleset or branch protection) to actually block merging.
+
+Freeze by adding the label to the release pull request; merging it (or removing the label) lifts the freeze. Call it on every pull request event that may change the result:
+
+``` yaml title=".github/workflows/release-freeze.yaml"
+name: Release freeze
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled, unlabeled, closed]
+jobs:
+  freeze:
+    uses: zeitonline/gh-action-workflows/.github/workflows/release-freeze.yaml
+    permissions:
+      statuses: write
+      pull-requests: read
+```
+
+`pull_request_target` runs the workflow from the base branch, so Renovate and Dependabot pull requests get a token that may set statuses (nothing from the pull request is checked out).
+
+#### Inputs
+
+| Name | Required | Default | Description |
+|------|----------|---------|-------------|
+| `label` | no | `freeze` | Label that freezes merging while any open pull request carries it |
+| `branch` | no | `main` | Base branch whose pull requests get the status |
