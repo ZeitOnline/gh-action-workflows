@@ -364,7 +364,7 @@ Posts a deployment notification to Slack (via Hackbot) and pushes a deployment t
 
 ### release-freeze
 
-Sets a `release-freeze` commit status on every open pull request: *failure* while any open pull request carries the `label` (typically the release-please one), *success* otherwise. Release-please's own pull request is always exempt. Make `release-freeze` a required status check (ruleset or branch protection) to actually block merging.
+Sets a `release-freeze` commit status on every open pull request: *pending* while any open pull request to `branch` carries the `label` (typically the release-please one), *success* otherwise. Pending blocks merging just like a failure, but shows the yellow dot, so frozen pull requests stand apart from failed ones, and auto-merge goes ahead once the freeze is lifted. Release-please's own pull request is always exempt. Make `release-freeze` a required status check (ruleset or branch protection) to actually block merging.
 
 Freeze by adding the label to the release pull request; merging it (or removing the label) lifts the freeze. Call it on every pull request event that may change the result:
 
@@ -372,7 +372,7 @@ Freeze by adding the label to the release pull request; merging it (or removing 
 name: Release freeze
 on:
   pull_request_target:
-    types: [opened, reopened, synchronize, labeled, unlabeled, closed]
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled, closed]
 jobs:
   freeze:
     uses: zeitonline/gh-action-workflows/.github/workflows/release-freeze.yaml
@@ -381,7 +381,9 @@ jobs:
       pull-requests: read
 ```
 
-`pull_request_target` runs the workflow from the base branch, so Renovate and Dependabot pull requests get a token that may set statuses (nothing from the pull request is checked out).
+`pull_request_target` runs the workflow from the base branch, so Renovate and Dependabot pull requests get a token that may set statuses (nothing from the pull request is checked out). `edited` only matters when the base changes (e.g. a stacked pull request moved onto `main`); other edits skip the job.
+
+Pull requests opened or updated with the default `GITHUB_TOKEN`, like release-please's, trigger no workflows, so they only get a status with the next event of another pull request. Release-please with an app token avoids that.
 
 #### Inputs
 
