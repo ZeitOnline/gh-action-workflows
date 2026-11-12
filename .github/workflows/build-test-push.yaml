@@ -33,6 +33,10 @@ on:
         required: false
         type: string
         default: .
+      registry_auth:
+        required: false
+        type: boolean
+        default: false
 env:
   COMPOSE_FILE: ${{ inputs.compose_file }}
 jobs:
@@ -50,6 +54,26 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      # set up variables and auth
+      - name: Set variables
+        id: vars
+        run: |
+          input="${{ inputs.project }}"
+          repository="${{ github.repository }}"
+          default="${repository##*/}"
+          project="${input:-$default}"
+          echo "project=$project" >> "$GITHUB_ENV"
+          echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
+          echo "describe=$( git describe --tags )" >> "$GITHUB_ENV"
+      - name: Setup auth
+        id: baseproject
+        uses: ZeitOnline/gh-action-baseproject@v0
+        if: inputs.targets || inputs.registry_auth
+        with:
+          project_name: ${{ env.project }}
+          environment: production     # needs 'production' service account
+          gar_docker_auth: true
+          vault_export_token: true
       # build images, run tests and handle artifacts
       - name: Run tests
         run: |
@@ -70,26 +94,6 @@ jobs:
         with:
           name: artifacts
           path: ${{ inputs.artifacts }}*
-      # set up variables and auth
-      - name: Set variables
-        id: vars
-        run: |
-          input="${{ inputs.project }}"
-          repository="${{ github.repository }}"
-          default="${repository##*/}"
-          project="${input:-$default}"
-          echo "project=$project" >> "$GITHUB_ENV"
-          echo "prefix=${{ vars.GAR_DOCKER_REGISTRY }}/$project" >> "$GITHUB_ENV"
-          echo "describe=$( git describe --tags )" >> "$GITHUB_ENV"
-      - name: Setup auth
-        id: baseproject
-        uses: ZeitOnline/gh-action-baseproject@v0
-        if: inputs.targets
-        with:
-          project_name: ${{ env.project }}
-          environment: production     # needs 'production' service account
-          gar_docker_auth: true
-          vault_export_token: true
       # prepare sysdig scans
       - name: Retrieve Sysdig secure token
         uses: hashicorp/vault-action@892a26828f195e65540a40b4768ae4571f51ebfc # v4

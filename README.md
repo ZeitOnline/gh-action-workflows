@@ -108,6 +108,7 @@ Runs tests inside Docker Compose, publishes test results, then builds each targe
 | `test_args` | no | `-- --verbose --junitxml=…` | Arguments passed to the test runner |
 | `artifacts` | no | — | Path to extract build artifacts from the container |
 | `build_args` | no | `.` | Additional arguments for `docker build` |
+| `registry_auth` | no | `false` | Log in to Google Artifact Registry before the tests, so the build can pull private base images (always on with `targets`) |
 
 ---
 
