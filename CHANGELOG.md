@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.10.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.9.0...4.10.0) (2026-11-12)
+
+
+### Features
+
+* block merging while a pull request carries a freeze label ([#185](https://github.com/ZeitOnline/gh-action-workflows/issues/185)) ([0c2296f](https://github.com/ZeitOnline/gh-action-workflows/commit/0c2296fc726ccb887606ced5710afaedb7469fd4))
+
+
+### Bug Fixes
+
+* **build-test-push:** log in to the registry before the tests ([#186](https://github.com/ZeitOnline/gh-action-workflows/issues/186)) ([9244277](https://github.com/ZeitOnline/gh-action-workflows/commit/9244277f449c2ab91f32f65c4672cd5e22a9e415))
+
 ## [4.9.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.8.0...4.9.0) (2026-10-29)
 
 
