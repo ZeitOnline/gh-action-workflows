@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.10.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.10.0...4.10.1) (2026-11-13)
+
+
+### Bug Fixes
+
+* **release-freeze:** read only commit statuses ([#188](https://github.com/ZeitOnline/gh-action-workflows/issues/188)) ([0e167e3](https://github.com/ZeitOnline/gh-action-workflows/commit/0e167e31f3c22661555dfeee0b28225db0c7107f))
+
 ## [4.10.0](https://github.com/ZeitOnline/gh-action-workflows/compare/4.9.0...4.10.0) (2026-11-12)
 
 
