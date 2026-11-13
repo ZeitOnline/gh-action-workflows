@@ -34,30 +34,35 @@ jobs:
           LABEL: ${{ inputs.label }}
           BRANCH: ${{ inputs.branch }}
         run: |
-          # filtered here rather than with `--label`, which goes through the
-          # search index and can miss a label that was just added
-          frozen=$(gh pr list --state open --base "$BRANCH" --limit 500 --json labels \
-              --jq '[.[] | select(any(.labels[]; .name == $ENV.LABEL))] | length')
-          if [ "$frozen" -gt 0 ]; then
+          # labels and head commits need only `pull-requests: read`; the
+          # current status is read per commit below (GraphQL would need
+          # `contents: read` and `checks: read` for it)
+          prs=$(gh pr list --state open --base "$BRANCH" --limit 500 \
+              --json number,headRefName,headRefOid,labels \
+              --jq '.[] | [
+                  .number, .headRefName, .headRefOid,
+                  (any(.labels[]; .name == $ENV.LABEL) | tostring)
+                ] | @tsv')
+          if awk -F '\t' '$4 == "true" { found = 1 } END { exit !found }' <<< "$prs"; then
             state=pending description="Release freeze, merging is blocked"
           else
             state=success description="No release freeze"
           fi
           echo "$description"
-          gh pr list --state open --base "$BRANCH" --limit 500 \
-              --json number,headRefName,headRefOid,statusCheckRollup \
-              --jq '.[] | "\(.number) \(.headRefName) \(.headRefOid) \([.statusCheckRollup[]? | select(.context == "release-freeze") | .state][0] // "NONE")"' |
-          while read -r number ref sha current; do
+          [ -n "$prs" ] || exit 0
+          while IFS=$'\t' read -r number ref sha _; do
             s=$state d=$description
             case "$ref" in  # the release itself has to stay mergeable
               release-please--*) s=success d="Release pull request, exempt from the freeze" ;;
             esac
             # GitHub keeps at most 1000 statuses per commit, so only set changes
-            if [ "$current" = "${s^^}" ]; then
+            current=$(gh api "repos/$GH_REPO/commits/$sha/statuses" \
+                --jq '[.[] | select(.context == "release-freeze")][0].state // "none"')
+            if [ "$current" = "$s" ]; then
               echo "#$number: $s (unchanged)"
               continue
             fi
             echo "#$number: $s"
             gh api "repos/$GH_REPO/statuses/$sha" --silent \
                 -f state="$s" -f context=release-freeze -f description="$d"
-          done
+          done <<< "$prs"
