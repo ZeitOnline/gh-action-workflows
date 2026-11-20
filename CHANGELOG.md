@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.10.2](https://github.com/ZeitOnline/gh-action-workflows/compare/4.10.1...4.10.2) (2026-11-20)
+
+
+### Bug Fixes
+
+* **release-freeze:** don't cancel other pull requests' runs ([#190](https://github.com/ZeitOnline/gh-action-workflows/issues/190)) ([44cd4e2](https://github.com/ZeitOnline/gh-action-workflows/commit/44cd4e2e034750543b38a0279ff02e5e2143c42f))
+
 ## [4.10.1](https://github.com/ZeitOnline/gh-action-workflows/compare/4.10.0...4.10.1) (2026-11-13)
 
 
