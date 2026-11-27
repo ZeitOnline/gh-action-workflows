@@ -1,0 +1,112 @@
+name: Lockfile Report
+
+on:
+  workflow_call:
+    inputs:
+      lockfiles:
+        description: "Space-separated paths of lockfiles to inspect"
+        type: string
+        default: "Cargo.lock package-lock.json uv.lock"
+      python-version:
+        description: "Optionally install Python with the given version. Special value `docker` extracts version from Dockerfile."
+        type: string
+      setup-command:
+        description: "Optional command to set up tools, plugins etc"
+        type: string
+        default: "uv sync --frozen --only-group renovate"
+      baseproject-name:
+        description: "Optional project name to pass to gh-action-baseproject"
+        type: string
+      baseproject-environment:
+        description: "Optional environment to pass to gh-action-baseproject"
+        type: string
+        default: "devel"
+
+jobs:
+  report:
+    concurrency: lockly-${{github.event.pull_request.number}}
+
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    if: github.event.pull_request.user.login == 'zon-renovate[bot]'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Parse input
+        run: |
+          if [[ "${{inputs.python-version}}" == "docker" ]]; then
+              python_version=$(sed -ne '/FROM python:/s+^FROM python:\([^-]*\).*$+\1+p' Dockerfile)
+              echo "python_version=$python_version" >> $GITHUB_ENV
+          else
+              echo "python_version=${{inputs.python-version}}" >> $GITHUB_ENV
+          fi
+      - name: Install Python
+        if: env.python_version
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{env.python_version}}
+      - name: baseproject
+        uses: ZeitOnline/gh-action-baseproject@v0
+        if: inputs.baseproject-name
+        with:
+          project_name: ${{inputs.baseproject-name}}
+          environment: ${{inputs.baseproject-environment}}
+          google_auth: true # for pypi-zon download
+      - name: Make uv-installed commands available directly on PATH
+        run: echo ${{github.workspace}}/.venv/bin >> $GITHUB_PATH
+      - name: Run setup command
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{github.workspace}}/.venv
+        run: ${{inputs.setup-command}}
+
+      - name: Generate report
+        env:
+          BASE: ${{github.event.pull_request.base.sha}}
+        run: |
+          # actions/checkout is shallow by default, so the base commit may be missing.
+          git fetch --no-tags --quiet --depth=1 origin "$BASE"
+
+          lockly diff --no-cache --offline --quiet --base "$BASE" --json lockly.json ${{inputs.lockfiles}}
+
+          echo "<!-- lockly -->" > lockly.md
+
+          # GitHub rejects comments over 65536 characters, so cap the rows per lockfile.
+          jq -r --argjson max "150" '
+                .lockfiles[]
+                | select(.changes | length > 0)
+                | (.changes | sort_by(.name)) as $changes
+                | "### \(.path)\n",
+                  "| Package | From | To |",
+                  "|---|---|---|",
+                  ($changes[:$max][] | "| \(.name) | `\(.from // "–")` | `\(.to // "–")` |"),
+                  "",
+                  (if ($changes | length) > $max
+                   then "... and \(($changes | length) - $max) more changes not shown._\n"
+                   else empty end)
+              ' lockly.json >> lockly.md
+
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{github.token}}
+          REPO: ${{github.repository}}
+          PR: ${{github.event.pull_request.number}}
+        run: |
+          changes=$(jq '[.lockfiles[].changes | length] | add // 0' lockly.json)
+          if [[ "$changes" = "0" ]]; then
+              exit 0
+          fi
+
+          existing=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+            --jq '.[] | select(.body | startswith("<!-- lockly -->")) | .id' \
+            | head -n1)
+
+          if [[ -n "$existing" ]]; then
+               gh api --method PATCH "repos/$REPO/issues/comments/$existing" --field body=@lockly.md
+          else
+               gh api --method POST "repos/$REPO/issues/$PR/comments" --field body=@lockly.md
+          fi

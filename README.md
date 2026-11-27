@@ -217,6 +217,25 @@ Runs code quality checks using [Lefthook](https://github.com/evilmartians/leftho
 | `baseproject-name` | no | — | Project name passed to `gh-action-baseproject`. When set, authenticates to Google Cloud so linting tools can be installed from the private `pypi-zon` index |
 | `baseproject-environment` | no | `devel` | Environment passed to `gh-action-baseproject` |
 
+
+### lockfile-report
+
+Renovate annoyingly does not create a summary table for "lockfile maintenance",
+so the changed packages and versions can be inspected at a glance.
+Until upstream learns this, here's a workaround based on [lockly](https://pypi.org/project/lockly/)
+(which looks very vibe-coded, but its parsers for uv/npm/cargo seem to work fine).
+
+#### Inputs
+
+| Name | Required | Default | Description |
+|------|----------|---------|-------------|
+| `lockfiles` | no | Cargo.lock package-lock.json uv.lock | Space-separated paths of lockfiles to inspect |
+| `python-version` | no | — | Python version to install (if needed). The special value `docker` extracts the version from the `FROM python:…` line of the `Dockerfile` |
+| `setup-command` | no | `uv sync --frozen --only-group renovate` | Command to install `lockly` |
+| `baseproject-name` | no | — | Project name passed to `gh-action-baseproject`. When set, authenticates to Google Cloud so linting tools can be installed from the private `pypi-zon` index |
+| `baseproject-environment` | no | `devel` | Environment passed to `gh-action-baseproject` |
+
+
 ---
 
 ### pre-commit
